@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import { authRouter } from './auth/routes.js';
+import { authorsRouter } from './authors/routes.js';
+import { booksRouter, genresRouter, searchRouter } from './books/routes.js';
 
 /**
  * The API router.
@@ -19,3 +22,9 @@ apiRouter.get('/', (_req, res) => {
     },
   });
 });
+
+apiRouter.use('/auth', authRouter);
+apiRouter.use('/books', booksRouter);
+apiRouter.use('/authors', authorsRouter);
+apiRouter.use('/genres', genresRouter);
+apiRouter.use('/search', searchRouter);
