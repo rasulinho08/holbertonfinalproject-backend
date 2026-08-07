@@ -1,0 +1,82 @@
+[
+  {
+    "id": "bd_1",
+    "slug": "first_10",
+    "name": "İlk 10 kitab",
+    "description": "10 kitab oxu",
+    "icon": "📚",
+    "target": 10
+  },
+  {
+    "id": "bd_2",
+    "slug": "quote_master",
+    "name": "Sitat ustası",
+    "description": "25 sitat paylaş",
+    "icon": "✍️",
+    "target": 25
+  },
+  {
+    "id": "bd_3",
+    "slug": "genre_explorer",
+    "name": "Janr kəşfiyyatçısı",
+    "description": "6 fərqli janrda kitab oxu",
+    "icon": "🧭",
+    "target": 6
+  },
+  {
+    "id": "bd_4",
+    "slug": "book_collector",
+    "name": "Kolleksiyaçı",
+    "description": "Rəflərinə 50 kitab əlavə et",
+    "icon": "🗂️",
+    "target": 50
+  },
+  {
+    "id": "bd_5",
+    "slug": "reading_marathon",
+    "name": "Oxu marafonu",
+    "description": "Bir həftədə 500 səhifə oxu",
+    "icon": "🏃",
+    "target": 500
+  },
+  {
+    "id": "bd_6",
+    "slug": "bookworm",
+    "name": "Kitab qurdu",
+    "description": "30 gün ardıcıl oxu",
+    "icon": "🐛",
+    "target": 30
+  },
+  {
+    "id": "bd_7",
+    "slug": "critic",
+    "name": "Tənqidçi",
+    "description": "20 rəy yaz",
+    "icon": "⭐",
+    "target": 20
+  },
+  {
+    "id": "bd_8",
+    "slug": "night_owl",
+    "name": "Gecə quşu",
+    "description": "Gecə saat 00:00-dan sonra 10 dəfə oxu",
+    "icon": "🦉",
+    "target": 10
+  },
+  {
+    "id": "bd_9",
+    "slug": "social_reader",
+    "name": "Sosial oxucu",
+    "description": "25 nəfəri izlə",
+    "icon": "🤝",
+    "target": 25
+  },
+  {
+    "id": "bd_10",
+    "slug": "goal_crusher",
+    "name": "Hədəf ovçusu",
+    "description": "İllik oxu hədəfini tamamla",
+    "icon": "🎯",
+    "target": 1
+  }
+]

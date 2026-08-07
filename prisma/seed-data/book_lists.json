@@ -1,0 +1,1071 @@
+[
+  {
+    "id": "bl_1",
+    "slug": "azerbaycan-klassikleri",
+    "title": "Azərbaycan klassikləri",
+    "description": "Məktəb proqramından tanıdığın, amma yenidən oxumağa dəyən əsərlər.",
+    "ownerId": "u_1",
+    "isOfficial": false,
+    "followersCount": 3326,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_29",
+        "note": null,
+        "position": 0
+      },
+      {
+        "bookId": "b_11",
+        "note": null,
+        "position": 1
+      },
+      {
+        "bookId": "b_21",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 2
+      },
+      {
+        "bookId": "b_15",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 3
+      },
+      {
+        "bookId": "b_4",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 4
+      },
+      {
+        "bookId": "b_26",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 5
+      },
+      {
+        "bookId": "b_18",
+        "note": null,
+        "position": 6
+      },
+      {
+        "bookId": "b_27",
+        "note": null,
+        "position": 7
+      },
+      {
+        "bookId": "b_14",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 8
+      },
+      {
+        "bookId": "b_31",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 9
+      },
+      {
+        "bookId": "b_12",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 10
+      },
+      {
+        "bookId": "b_24",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 11
+      },
+      {
+        "bookId": "b_22",
+        "note": null,
+        "position": 12
+      },
+      {
+        "bookId": "b_13",
+        "note": null,
+        "position": 13
+      },
+      {
+        "bookId": "b_28",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 14
+      },
+      {
+        "bookId": "b_1",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 15
+      },
+      {
+        "bookId": "b_23",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 16
+      },
+      {
+        "bookId": "b_37",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 17
+      },
+      {
+        "bookId": "b_9",
+        "note": null,
+        "position": 18
+      },
+      {
+        "bookId": "b_794",
+        "note": null,
+        "position": 19
+      }
+    ],
+    "createdAt": "2025-07-14T21:08:04.711Z"
+  },
+  {
+    "id": "bl_2",
+    "slug": "baslangic-ucun-fantastika",
+    "title": "Başlanğıc üçün fantastika",
+    "description": "Janrla ilk dəfə tanış olanlar üçün seçilmiş, uzunluğu qorxutmayan kitablar.",
+    "ownerId": "u_1",
+    "isOfficial": false,
+    "followersCount": 669,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_118",
+        "note": null,
+        "position": 0
+      },
+      {
+        "bookId": "b_7",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 1
+      },
+      {
+        "bookId": "b_21",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 2
+      },
+      {
+        "bookId": "b_35",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 3
+      },
+      {
+        "bookId": "b_130",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 4
+      },
+      {
+        "bookId": "b_124",
+        "note": null,
+        "position": 5
+      },
+      {
+        "bookId": "b_131",
+        "note": null,
+        "position": 6
+      },
+      {
+        "bookId": "b_183",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 7
+      },
+      {
+        "bookId": "b_122",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 8
+      },
+      {
+        "bookId": "b_126",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 9
+      },
+      {
+        "bookId": "b_200",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 10
+      },
+      {
+        "bookId": "b_31",
+        "note": null,
+        "position": 11
+      },
+      {
+        "bookId": "b_34",
+        "note": null,
+        "position": 12
+      },
+      {
+        "bookId": "b_212",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 13
+      },
+      {
+        "bookId": "b_165",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 14
+      },
+      {
+        "bookId": "b_163",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 15
+      },
+      {
+        "bookId": "b_669",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 16
+      },
+      {
+        "bookId": "b_209",
+        "note": null,
+        "position": 17
+      },
+      {
+        "bookId": "b_153",
+        "note": null,
+        "position": 18
+      },
+      {
+        "bookId": "b_186",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 19
+      },
+      {
+        "bookId": "b_191",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 20
+      },
+      {
+        "bookId": "b_187",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 21
+      },
+      {
+        "bookId": "b_185",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 22
+      },
+      {
+        "bookId": "b_203",
+        "note": null,
+        "position": 23
+      }
+    ],
+    "createdAt": "2026-04-29T21:08:04.711Z"
+  },
+  {
+    "id": "bl_3",
+    "slug": "bir-gecelik-kitablar",
+    "title": "Bir gecəyə sığan kitablar",
+    "description": "200 səhifədən qısa — bir oturuma bitirmək mümkündür.",
+    "ownerId": "u_7",
+    "isOfficial": true,
+    "followersCount": 4033,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_754",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 0
+      },
+      {
+        "bookId": "b_52",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 1
+      },
+      {
+        "bookId": "b_19",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 2
+      },
+      {
+        "bookId": "b_15",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 3
+      },
+      {
+        "bookId": "b_26",
+        "note": null,
+        "position": 4
+      },
+      {
+        "bookId": "b_32",
+        "note": null,
+        "position": 5
+      },
+      {
+        "bookId": "b_181",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 6
+      },
+      {
+        "bookId": "b_18",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 7
+      },
+      {
+        "bookId": "b_802",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 8
+      },
+      {
+        "bookId": "b_43",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 9
+      },
+      {
+        "bookId": "b_8",
+        "note": null,
+        "position": 10
+      },
+      {
+        "bookId": "b_122",
+        "note": null,
+        "position": 11
+      },
+      {
+        "bookId": "b_136",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 12
+      },
+      {
+        "bookId": "b_3",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 13
+      },
+      {
+        "bookId": "b_800",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 14
+      },
+      {
+        "bookId": "b_808",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 15
+      },
+      {
+        "bookId": "b_30",
+        "note": null,
+        "position": 16
+      },
+      {
+        "bookId": "b_146",
+        "note": null,
+        "position": 17
+      },
+      {
+        "bookId": "b_22",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 18
+      },
+      {
+        "bookId": "b_158",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 19
+      },
+      {
+        "bookId": "b_144",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 20
+      },
+      {
+        "bookId": "b_202",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 21
+      },
+      {
+        "bookId": "b_348",
+        "note": null,
+        "position": 22
+      },
+      {
+        "bookId": "b_301",
+        "note": null,
+        "position": 23
+      },
+      {
+        "bookId": "b_134",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 24
+      },
+      {
+        "bookId": "b_308",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 25
+      },
+      {
+        "bookId": "b_153",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 26
+      },
+      {
+        "bookId": "b_241",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 27
+      },
+      {
+        "bookId": "b_184",
+        "note": null,
+        "position": 28
+      },
+      {
+        "bookId": "b_142",
+        "note": null,
+        "position": 29
+      }
+    ],
+    "createdAt": "2026-06-29T21:08:04.711Z"
+  },
+  {
+    "id": "bl_4",
+    "slug": "ozunu-tanimaq",
+    "title": "Özünü tanımaq üçün",
+    "description": "Psixologiya və şəxsi inkişaf — reklam deyil, oxunmağa dəyənlər.",
+    "ownerId": "u_10",
+    "isOfficial": true,
+    "followersCount": 663,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_398",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 0
+      },
+      {
+        "bookId": "b_52",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 1
+      },
+      {
+        "bookId": "b_399",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 2
+      },
+      {
+        "bookId": "b_548",
+        "note": null,
+        "position": 3
+      },
+      {
+        "bookId": "b_53",
+        "note": null,
+        "position": 4
+      },
+      {
+        "bookId": "b_51",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 5
+      },
+      {
+        "bookId": "b_401",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 6
+      },
+      {
+        "bookId": "b_400",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 7
+      },
+      {
+        "bookId": "b_50",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 8
+      },
+      {
+        "bookId": "b_402",
+        "note": null,
+        "position": 9
+      },
+      {
+        "bookId": "b_403",
+        "note": null,
+        "position": 10
+      },
+      {
+        "bookId": "b_406",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 11
+      },
+      {
+        "bookId": "b_241",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 12
+      },
+      {
+        "bookId": "b_238",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 13
+      },
+      {
+        "bookId": "b_411",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 14
+      },
+      {
+        "bookId": "b_405",
+        "note": null,
+        "position": 15
+      },
+      {
+        "bookId": "b_412",
+        "note": null,
+        "position": 16
+      },
+      {
+        "bookId": "b_427",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 17
+      },
+      {
+        "bookId": "b_23",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 18
+      },
+      {
+        "bookId": "b_410",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 19
+      },
+      {
+        "bookId": "b_416",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 20
+      },
+      {
+        "bookId": "b_428",
+        "note": null,
+        "position": 21
+      },
+      {
+        "bookId": "b_414",
+        "note": null,
+        "position": 22
+      },
+      {
+        "bookId": "b_408",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 23
+      },
+      {
+        "bookId": "b_507",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 24
+      }
+    ],
+    "createdAt": "2026-01-20T21:08:04.711Z"
+  },
+  {
+    "id": "bl_5",
+    "slug": "detektiv-gecesi",
+    "title": "Detektiv gecəsi",
+    "description": "Sonunu tapmağa çalışacağın, çox vaxt bacarmayacağın kitablar.",
+    "ownerId": "u_13",
+    "isOfficial": true,
+    "followersCount": 1250,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_39",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 0
+      },
+      {
+        "bookId": "b_38",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 1
+      },
+      {
+        "bookId": "b_298",
+        "note": null,
+        "position": 2
+      },
+      {
+        "bookId": "b_69",
+        "note": null,
+        "position": 3
+      },
+      {
+        "bookId": "b_70",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 4
+      },
+      {
+        "bookId": "b_407",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 5
+      },
+      {
+        "bookId": "b_60",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 6
+      },
+      {
+        "bookId": "b_62",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 7
+      },
+      {
+        "bookId": "b_64",
+        "note": null,
+        "position": 8
+      },
+      {
+        "bookId": "b_58",
+        "note": null,
+        "position": 9
+      },
+      {
+        "bookId": "b_760",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 10
+      },
+      {
+        "bookId": "b_78",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 11
+      },
+      {
+        "bookId": "b_61",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 12
+      },
+      {
+        "bookId": "b_71",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 13
+      },
+      {
+        "bookId": "b_182",
+        "note": null,
+        "position": 14
+      },
+      {
+        "bookId": "b_37",
+        "note": null,
+        "position": 15
+      },
+      {
+        "bookId": "b_67",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 16
+      },
+      {
+        "bookId": "b_981",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 17
+      },
+      {
+        "bookId": "b_99",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 18
+      },
+      {
+        "bookId": "b_695",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 19
+      },
+      {
+        "bookId": "b_68",
+        "note": null,
+        "position": 20
+      },
+      {
+        "bookId": "b_969",
+        "note": null,
+        "position": 21
+      },
+      {
+        "bookId": "b_433",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 22
+      },
+      {
+        "bookId": "b_814",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 23
+      },
+      {
+        "bookId": "b_88",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 24
+      }
+    ],
+    "createdAt": "2025-12-26T21:08:04.711Z"
+  },
+  {
+    "id": "bl_6",
+    "slug": "usaqla-birlikde",
+    "title": "Uşaqla birlikdə oxumaq üçün",
+    "description": "Həm uşağın, həm də sənin maraqla oxuyacağın kitablar.",
+    "ownerId": "u_2",
+    "isOfficial": true,
+    "followersCount": 1239,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_118",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 0
+      },
+      {
+        "bookId": "b_35",
+        "note": null,
+        "position": 1
+      },
+      {
+        "bookId": "b_26",
+        "note": null,
+        "position": 2
+      },
+      {
+        "bookId": "b_32",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 3
+      },
+      {
+        "bookId": "b_130",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 4
+      },
+      {
+        "bookId": "b_124",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 5
+      },
+      {
+        "bookId": "b_131",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 6
+      },
+      {
+        "bookId": "b_127",
+        "note": null,
+        "position": 7
+      },
+      {
+        "bookId": "b_136",
+        "note": null,
+        "position": 8
+      },
+      {
+        "bookId": "b_755",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 9
+      },
+      {
+        "bookId": "b_129",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 10
+      },
+      {
+        "bookId": "b_125",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 11
+      },
+      {
+        "bookId": "b_600",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 12
+      },
+      {
+        "bookId": "b_34",
+        "note": null,
+        "position": 13
+      },
+      {
+        "bookId": "b_133",
+        "note": null,
+        "position": 14
+      },
+      {
+        "bookId": "b_146",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 15
+      },
+      {
+        "bookId": "b_120",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 16
+      },
+      {
+        "bookId": "b_135",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 17
+      },
+      {
+        "bookId": "b_198",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 18
+      },
+      {
+        "bookId": "b_163",
+        "note": null,
+        "position": 19
+      },
+      {
+        "bookId": "b_418",
+        "note": null,
+        "position": 20
+      },
+      {
+        "bookId": "b_144",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 21
+      },
+      {
+        "bookId": "b_143",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 22
+      },
+      {
+        "bookId": "b_207",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 23
+      }
+    ],
+    "createdAt": "2026-03-05T21:08:04.711Z"
+  },
+  {
+    "id": "bl_7",
+    "slug": "tarixin-icinden",
+    "title": "Tarixin içindən",
+    "description": "Keçmişi tarix dərsliyindən fərqli danışan kitablar.",
+    "ownerId": "u_5",
+    "isOfficial": true,
+    "followersCount": 2118,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_25",
+        "note": null,
+        "position": 0
+      },
+      {
+        "bookId": "b_48",
+        "note": null,
+        "position": 1
+      },
+      {
+        "bookId": "b_16",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 2
+      },
+      {
+        "bookId": "b_6",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 3
+      },
+      {
+        "bookId": "b_810",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 4
+      },
+      {
+        "bookId": "b_10",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 5
+      },
+      {
+        "bookId": "b_47",
+        "note": null,
+        "position": 6
+      },
+      {
+        "bookId": "b_795",
+        "note": null,
+        "position": 7
+      },
+      {
+        "bookId": "b_200",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 8
+      },
+      {
+        "bookId": "b_808",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 9
+      },
+      {
+        "bookId": "b_202",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 10
+      },
+      {
+        "bookId": "b_17",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 11
+      },
+      {
+        "bookId": "b_148",
+        "note": null,
+        "position": 12
+      },
+      {
+        "bookId": "b_304",
+        "note": null,
+        "position": 13
+      },
+      {
+        "bookId": "b_308",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 14
+      },
+      {
+        "bookId": "b_241",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 15
+      },
+      {
+        "bookId": "b_45",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 16
+      },
+      {
+        "bookId": "b_180",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 17
+      },
+      {
+        "bookId": "b_965",
+        "note": null,
+        "position": 18
+      },
+      {
+        "bookId": "b_57",
+        "note": null,
+        "position": 19
+      },
+      {
+        "bookId": "b_238",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 20
+      },
+      {
+        "bookId": "b_316",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 21
+      },
+      {
+        "bookId": "b_159",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 22
+      },
+      {
+        "bookId": "b_239",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 23
+      },
+      {
+        "bookId": "b_208",
+        "note": null,
+        "position": 24
+      }
+    ],
+    "createdAt": "2026-01-18T21:08:04.711Z"
+  },
+  {
+    "id": "bl_8",
+    "slug": "qalin-amma-deyer",
+    "title": "Qalın, amma dəyər",
+    "description": "600 səhifədən yuxarı. Vaxt ayır — peşman olmayacaqsan.",
+    "ownerId": "u_8",
+    "isOfficial": true,
+    "followersCount": 1700,
+    "followerIds": [],
+    "items": [
+      {
+        "bookId": "b_25",
+        "note": null,
+        "position": 0
+      },
+      {
+        "bookId": "b_119",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 1
+      },
+      {
+        "bookId": "b_812",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 2
+      },
+      {
+        "bookId": "b_121",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 3
+      },
+      {
+        "bookId": "b_129",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 4
+      },
+      {
+        "bookId": "b_803",
+        "note": null,
+        "position": 5
+      },
+      {
+        "bookId": "b_133",
+        "note": null,
+        "position": 6
+      },
+      {
+        "bookId": "b_12",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 7
+      },
+      {
+        "bookId": "b_24",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 8
+      },
+      {
+        "bookId": "b_120",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 9
+      },
+      {
+        "bookId": "b_135",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 10
+      },
+      {
+        "bookId": "b_36",
+        "note": null,
+        "position": 11
+      },
+      {
+        "bookId": "b_170",
+        "note": null,
+        "position": 12
+      },
+      {
+        "bookId": "b_138",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 13
+      },
+      {
+        "bookId": "b_59",
+        "note": "Əvvəlcə bunu oxu, sonra qalanları.",
+        "position": 14
+      },
+      {
+        "bookId": "b_57",
+        "note": "Ən çox müzakirə olunanı.",
+        "position": 15
+      },
+      {
+        "bookId": "b_997",
+        "note": "Qısadır, amma yaddan çıxmır.",
+        "position": 16
+      },
+      {
+        "bookId": "b_663",
+        "note": null,
+        "position": 17
+      },
+      {
+        "bookId": "b_760",
+        "note": null,
+        "position": 18
+      },
+      {
+        "bookId": "b_78",
+        "note": "Siyahının ən yaxşı başlanğıc nöqtəsi.",
+        "position": 19
+      }
+    ],
+    "createdAt": "2026-05-11T21:08:04.711Z"
+  }
+]
