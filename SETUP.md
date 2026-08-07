@@ -66,9 +66,19 @@ docker compose ps
 
 You should see `kitabdostu-postgres` with status `healthy`.
 
-**The database is on port 5433, not 5432.** That is deliberate — if you already
-have PostgreSQL installed on Windows it is using 5432, and the two would
-collide. `DATABASE_URL` in `.env.example` already points at 5433.
+**The database is on port 5544, not 5432.** A PostgreSQL installed natively on
+Windows takes 5432, and on at least one machine here it was already on 5433 as
+well. That second case is worth knowing about because of how it fails: Docker
+still reports the mapping as bound, but connections to `localhost` reach the
+*native* server, so `prisma migrate` returns
+
+```
+P1000: Authentication failed ... credentials for `kitabdostu` are not valid
+```
+
+with credentials that are, in fact, correct. 5544 avoids it. If that port is
+also taken on your machine, change it in **both** `docker-compose.yml` and
+`DATABASE_URL` — they have to agree.
 
 There is also a web UI for poking at the data at **http://localhost:8090**
 (server `postgres`, user `kitabdostu`, password `kitabdostu`, database
@@ -201,13 +211,24 @@ npm run typecheck      # tsc --noEmit
 
 ## When something goes wrong
 
-**`Can't reach database server at localhost:5433`**
+**`Can't reach database server at localhost:5544`**
 Docker Desktop is not running, or the container is not up. Open Docker Desktop,
 wait for "Engine running", then `docker compose up -d`.
 
+**`P1000: Authentication failed` with credentials that look right**
+Another PostgreSQL is already bound to that port and is answering instead of
+the container. Check with:
+
+```bash
+docker exec kitabdostu-postgres psql -U kitabdostu -d kitabdostu -c "select 1"
+```
+
+If that works but Prisma still fails, the container is fine and something on
+the host owns the port. Pick a free one and change it in both
+`docker-compose.yml` and `DATABASE_URL`.
+
 **`port is already allocated`**
-Something else holds 5433. Change the host side of the mapping in
-`docker-compose.yml` (`'5434:5432'`) and update `DATABASE_URL` to match.
+Same cause, reported earlier. Same fix.
 
 **`Environment variable not found: DATABASE_URL`**
 You have not created `.env`. Run `cp .env.example .env`.
