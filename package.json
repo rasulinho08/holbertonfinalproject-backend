@@ -23,7 +23,8 @@
     "migrate": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
-    "setup": "npm run db:up && npm run migrate -- --name init && npm run seed"
+    "setup": "npm run db:up && npm run migrate -- --name init && npm run seed",
+    "smoke:full": "node scripts/smoke-full.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

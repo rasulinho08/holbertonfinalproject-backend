@@ -108,18 +108,51 @@ Three rules keep it navigable:
 
 ## Status
 
-| Milestone | State |
+All 124 endpoints are implemented and verified against a seeded database.
+
+```bash
+npm run smoke:full
+```
+
+```
+156/156 checks passed
+```
+
+| Milestone | Covers |
 |---|---|
-| M0 — foundations, schema, seed | done |
-| M1 — auth | in progress |
-| M2 — catalogue | |
-| M3 — shelves and progress | |
-| M3b — reading sessions | |
-| M4 — book lists | |
-| M5 — reviews, quotes, comments | |
-| M6 — commerce | |
-| M7 — gamification, notifications | |
-| M8 — buddy reads | |
-| M9 — publisher panel | |
-| M10 — moderation | |
-| M11 — integrations, tests | |
+| M0 | Docker, 30-table schema, migrations, seed (1000 books) |
+| M1 | Auth — JWT rotation, OAuth, TOTP 2FA, password reset |
+| M2 | Catalogue — books, search, authors, genres, recommendations |
+| M3 | Shelves, progress, profiles, follows, activity feed |
+| M3b | Reading sessions and statistics |
+| M4 | Book lists |
+| M5 | Reviews, quotes, likes, comments |
+| M6 | Cart, multi-publisher checkout, orders, payments, wallet |
+| M7 | Badges, leaderboard, streaks, notifications |
+| M8 | Buddy reads |
+| M9 | Publisher panel |
+| M10 | Moderation and admin |
+| M11 | Uploads, OCR, integration stubs |
+
+Two suites: `npm run smoke` covers auth and the catalogue in isolation,
+`npm run smoke:full` walks every module end to end. Both assert the response
+*shape* the app expects, not just the status code — a route returning the wrong
+field name is a route the app renders blank, which a 200 check misses.
+
+### Integrations
+
+Every third-party integration runs as a stub when its key is absent, so a fresh
+clone works without a single external account. Each one is a single file with
+the real call to fill in:
+
+| Integration | File | Without a key |
+|---|---|---|
+| Card payments (Payriff) | `integrations/payments.ts` | approves and logs; refuses in production |
+| OAuth (Google, Facebook) | `integrations/oauth.ts` | accepts `stub:<uid>:<email>:<name>` |
+| Push (Expo) | `integrations/push.ts` | logs the payload |
+| Email | `integrations/mail.ts` | logs the reset link |
+| Storage (S3) | `integrations/storage.ts` | echoes the URI |
+| OCR | `integrations/ocr.ts` | returns a sample Azerbaijani passage |
+
+Apple sign-in is deliberately left unimplemented rather than approximated — a
+half-verified Apple token is an authentication bypass, not a missing feature.

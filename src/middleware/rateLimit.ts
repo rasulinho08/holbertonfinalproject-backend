@@ -32,19 +32,50 @@ const shared: Partial<Options> = {
   },
 };
 
-/** Sign-in, registration and password reset — the credential-stuffing surface. */
+/**
+ * Sign-in, registration and password reset — the credential-stuffing surface.
+ *
+ * CONVENTIONS.md §12 sets this at 10 per 15 minutes, which is right in
+ * production and actively unhelpful in development: a smoke run signs in as
+ * three different accounts several times over, and a developer restarting the
+ * app hits the wall within minutes. There is no credential-stuffing surface on
+ * localhost, so the window is loosened outside production rather than turned
+ * off entirely — the limiter still runs, so a bug in it surfaces during
+ * development rather than in production.
+ */
 export const authLimiter = rateLimit({
   ...shared,
   windowMs: 15 * 60 * 1000,
-  limit: 10,
+  limit: env.isProduction ? 10 : 500,
   // Explicitly per-IP: an attacker enumerating passwords is not authenticated,
   // so there is no user to key on.
   keyGenerator: (req) => req.ip ?? 'unknown',
 });
 
-/** OCR calls a paid third party, so it gets its own much tighter budget. */
+/** OCR calls a paid third party, so it keeps its tight budget everywhere. */
 export const ocrLimiter = rateLimit({ ...shared, windowMs: 60 * 60 * 1000, limit: 30 });
 
-export const writeLimiter = rateLimit({ ...shared, windowMs: 60 * 1000, limit: 120 });
+/**
+ * General read and write budgets.
+ *
+ * The production figures are CONVENTIONS.md §12: 120 writes and 600 reads per
+ * minute per user. No human approaches either — but the integration suite makes
+ * roughly 156 requests in a few seconds, and a developer running it twice in a
+ * row was getting throttled, which surfaces as a wall of unrelated failures
+ * rather than as a rate-limit message.
+ *
+ * Loosened outside production for the same reason as `authLimiter`: the
+ * middleware still runs, so a bug in it still shows up in development, but the
+ * ceiling is not one a test run can reach.
+ */
+export const writeLimiter = rateLimit({
+  ...shared,
+  windowMs: 60 * 1000,
+  limit: env.isProduction ? 120 : 5000,
+});
 
-export const readLimiter = rateLimit({ ...shared, windowMs: 60 * 1000, limit: 600 });
+export const readLimiter = rateLimit({
+  ...shared,
+  windowMs: 60 * 1000,
+  limit: env.isProduction ? 600 : 10_000,
+});
