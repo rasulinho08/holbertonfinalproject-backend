@@ -236,6 +236,17 @@ const GENRES = new Set([
 
 const LANGUAGES = new Set(['az', 'en', 'tr', 'ru']);
 
+/**
+ * The `published_year_sane` CHECK rejects anything outside 800–2100, and a
+ * handful of Open Library records carry no first-publish year at all — which
+ * reaches the export as 0. The column is nullable precisely for that case, so
+ * an unknown year is stored as unknown rather than as the year zero.
+ */
+function sanePublishedYear(year: number | null | undefined): number | null {
+  if (!year || year < 800 || year > 2100) return null;
+  return year;
+}
+
 /* ---------------------------------- run ----------------------------------- */
 
 async function main() {
@@ -317,7 +328,7 @@ async function main() {
       coverUrl: b.coverUrl,
       description: b.description,
       pageCount: b.pageCount,
-      publishedYear: b.publishedYear,
+      publishedYear: sanePublishedYear(b.publishedYear),
       price: decimal(b.price),
       oldPrice: b.oldPrice ? decimal(b.oldPrice) : null,
       stock: b.stock,

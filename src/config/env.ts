@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { z } from 'zod';
 
 /**
@@ -6,6 +7,11 @@ import { z } from 'zod';
  * Parsed once, at boot, and the process exits if anything required is missing.
  * A misconfigured server should fail immediately with a readable message rather
  * than at 3am on the one request that happens to need `JWT_REFRESH_SECRET`.
+ *
+ * `dotenv/config` is imported first, and this module is imported before
+ * anything else that reads config. The Prisma CLI loads `.env` on its own, so
+ * migrations worked while the server did not — which is a confusing way to
+ * discover the file was never being read.
  */
 
 const schema = z.object({

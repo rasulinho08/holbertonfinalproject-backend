@@ -4,8 +4,14 @@
 #   docker compose down       # stop, keep data
 #   docker compose down -v    # stop and wipe the volume
 #
-# The database is exposed on 5433 rather than the default 5432 so it cannot
-# collide with a PostgreSQL you may already have installed on the host.
+# The database is exposed on 5544, not the default 5432.
+#
+# A host PostgreSQL install takes 5432, and on at least one machine here it was
+# also already on 5433 — in that case Docker still reports the mapping as bound
+# while connections to localhost reach the *native* server, which fails
+# authentication with credentials that look correct. 5544 is far enough out of
+# the way to avoid that. If it is taken on your machine, change both this
+# mapping and DATABASE_URL in .env.
 
 services:
   postgres:
@@ -20,7 +26,7 @@ services:
       # collation matters for ə, ı, ö, ü, ç, ş, ğ in ORDER BY.
       LANG: en_US.utf8
     ports:
-      - '5433:5432'
+      - '5544:5432'
     volumes:
       - kitabdostu-pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -345,7 +345,9 @@ export async function similarBooks(
   const scored = await prisma.$queryRaw<{ id: string }[]>`
     SELECT b.id
     FROM books b
-    WHERE b.deleted_at IS NULL AND b.id <> ${id}
+    -- Every parameter compared against a uuid column needs an explicit cast:
+    -- Prisma binds strings as text, and Postgres has no uuid <> text operator.
+    WHERE b.deleted_at IS NULL AND b.id <> ${id}::uuid
     ORDER BY
       (
         cardinality(ARRAY(SELECT unnest(b.genres) INTERSECT SELECT unnest(${book.genres}::text[]))) * 2
