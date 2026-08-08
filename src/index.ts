@@ -41,6 +41,14 @@ async function shutdown(signal: string) {
     logger.info('Shutdown complete');
     process.exit(0);
   });
+
+  // `server.close()` stops accepting new connections but waits for existing
+  // ones — and a browser holds its keep-alive socket open for a minute. That
+  // makes every `tsx watch` reload race: the old process still owns the port,
+  // the new one dies with EADDRINUSE, and the old code keeps serving while the
+  // source says otherwise. Idle sockets are closed immediately; in-flight
+  // requests still finish through the callback above.
+  server.closeIdleConnections();
 }
 
 process.on('SIGTERM', () => void shutdown('SIGTERM'));

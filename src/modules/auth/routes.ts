@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { asyncHandler } from '../../middleware/error.js';
 import { validate } from '../../middleware/validate.js';
-import { requireAuth, userId } from '../../middleware/auth.js';
+import { optionalAuth, requireAuth, userId } from '../../middleware/auth.js';
 import { authLimiter } from '../../middleware/rateLimit.js';
 import { created, noContent, ok } from '../../lib/envelope.js';
 import { badRequest } from '../../lib/errors.js';
-import { revokeRefreshToken } from '../../lib/tokens.js';
+import { revokeAllUserTokens, revokeRefreshToken } from '../../lib/tokens.js';
 import { isSupportedProvider } from '../../integrations/oauth.js';
 import * as service from './service.js';
 import {
@@ -68,14 +68,27 @@ authRouter.post(
   }),
 );
 
+/**
+ * Sign out.
+ *
+ * Deliberately **not** behind `requireAuth`. Demanding a valid access token to
+ * discard credentials is a contradiction, and it produced a real loop: the app
+ * calls logout when it sees a 401, logout answered 401 because the token was
+ * already dead, the app saw another 401 and called logout again — until the
+ * auth rate limit tripped and even signing back in returned 429.
+ *
+ * Always 204. Revoking a token that is already revoked, or absent, is a no-op.
+ */
 authRouter.post(
   '/logout',
-  requireAuth,
+  optionalAuth,
   asyncHandler(async (req, res) => {
-    // The body is optional: a client that has already dropped its refresh token
-    // still gets a clean 204 rather than a validation error on sign-out.
     const token = typeof req.body?.refreshToken === 'string' ? req.body.refreshToken : null;
     if (token) await revokeRefreshToken(token);
+    // With no refresh token to identify the session, revoke every session for
+    // the caller if the access token is still readable — otherwise there is
+    // nothing to act on, and the client only needs the acknowledgement.
+    else if (req.auth) await revokeAllUserTokens(req.auth.sub);
     noContent(res);
   }),
 );
