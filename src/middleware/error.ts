@@ -75,6 +75,17 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     return;
   }
 
+  // `express.json()` throws a SyntaxError on a body it cannot parse — a
+  // truncated upload, a client that forgot to stringify. That is the client's
+  // mistake, so it deserves a 4xx; without this it fell through to the generic
+  // handler and reported 500, which points the blame at the wrong side.
+  if (err instanceof SyntaxError && 'body' in (err as unknown as Record<string, unknown>)) {
+    res.status(400).json({
+      error: { code: 'VALIDATION_ERROR', message: 'Request body is not valid JSON' },
+    });
+    return;
+  }
+
   if (isUniqueViolation(err)) {
     res.status(409).json({
       error: { code: 'CONFLICT', message: 'That record already exists' },

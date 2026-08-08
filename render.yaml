@@ -1,0 +1,52 @@
+# Render blueprint.
+#
+# Render is not required — the Dockerfile runs anywhere. This file just means
+# the service can be created by pointing Render at the repository instead of
+# filling in a form.
+#
+# The database is deliberately NOT declared here. Render's free Postgres is
+# deleted after 30 days, which is a bad surprise for a project that has to be
+# demonstrable later; use Neon's free tier instead and paste its connection
+# string into DATABASE_URL. See DEPLOY.md.
+
+services:
+  - type: web
+    name: kitabdostu-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Paste the Neon connection string here in the Render dashboard.
+      # Neon requires TLS, so keep `?sslmode=require` on the end.
+      - key: DATABASE_URL
+        sync: false
+
+      # Generated once by Render and kept. Rotating them signs everyone out.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      - key: JWT_ACCESS_TTL
+        value: 15m
+      - key: JWT_REFRESH_TTL
+        value: 30d
+
+      # Every origin that may call the API, comma-separated. The Netlify site
+      # belongs here — a browser blocks the request otherwise, and the failure
+      # looks like the API being down rather than a CORS rule.
+      - key: CORS_ORIGINS
+        sync: false
+
+      - key: DEFAULT_TIMEZONE
+        value: Asia/Baku
+      - key: DEFAULT_LOCALE
+        value: az
+
+      # Integrations stay unset; each one runs as a stub. Card payments are the
+      # exception — the service refuses to start a real charge without
+      # credentials rather than silently approving one.

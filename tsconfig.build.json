@@ -1,0 +1,18 @@
+{
+  // Production build.
+  //
+  // The root tsconfig includes `prisma/` and `tests/` so the editor and
+  // `npm run typecheck` cover them. That widens `rootDir` to the repository
+  // root, which puts the output at `dist/src/index.js` — while `start` and the
+  // Dockerfile both expect `dist/index.js`. Building from a config that sees
+  // only `src` keeps the layout flat.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": false,
+    "noEmit": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests", "prisma", "scripts"]
+}
