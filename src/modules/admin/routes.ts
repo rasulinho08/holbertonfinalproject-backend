@@ -58,6 +58,15 @@ adminRouter.get(
 );
 
 adminRouter.get(
+  '/users',
+  asyncHandler(async (req, res) => {
+    const { page: pageNumber, limit, skip, take } = pagination(req);
+    const result = await service.adminUsers(queryString(req.query.q), skip, take);
+    page(res, result.items, buildMeta(result.total, pageNumber, limit));
+  }),
+);
+
+adminRouter.get(
   '/reports',
   asyncHandler(async (req, res) => {
     const { page: pageNumber, limit, skip, take } = pagination(req);
