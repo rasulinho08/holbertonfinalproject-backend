@@ -216,9 +216,15 @@ export async function updateReview(
 }
 
 export async function deleteReview(userId: string, id: string, asModerator = false): Promise<void> {
-  const review = await prisma.review.findFirst({ where: { id, deletedAt: null } });
+  const review = await prisma.review.findUnique({ where: { id } });
   if (!review) throw notFound('Review');
   if (!asModerator && review.userId !== userId) throw forbidden('This is not your review');
+
+  // Already gone. The moderation list shows removed rows so a moderator can see
+  // what was taken down, so the delete action is reachable on something already
+  // deleted — and a 404 there reads as "the button is broken". Deleting twice
+  // is a no-op, and decrementing the aggregates again would corrupt them.
+  if (review.deletedAt) return;
 
   await prisma.$transaction([
     // Soft delete: moderation needs the original text after removal.
@@ -367,9 +373,12 @@ export async function createQuote(
 }
 
 export async function deleteQuote(userId: string, id: string, asModerator = false): Promise<void> {
-  const quote = await prisma.quote.findFirst({ where: { id, deletedAt: null } });
+  const quote = await prisma.quote.findUnique({ where: { id } });
   if (!quote) throw notFound('Quote');
   if (!asModerator && quote.userId !== userId) throw forbidden('This is not your quote');
+
+  // See deleteReview: removing something already removed is a no-op, not a 404.
+  if (quote.deletedAt) return;
 
   await prisma.$transaction([
     prisma.quote.update({ where: { id }, data: { deletedAt: new Date() } }),
