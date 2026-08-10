@@ -537,24 +537,34 @@ export async function advanceStatus(
   }
 }
 
+/**
+ * The e-receipt.
+ *
+ * Field names follow ENDPOINTS.md §10 exactly — `lines`, with `unitPrice` and
+ * `total` per line. An earlier version returned `items`/`price`/`lineTotal`,
+ * which typechecked on both sides (neither knows the other's types at compile
+ * time) and crashed the order screen at runtime the moment the receipt loaded:
+ * `receipt.lines.map` on undefined takes the whole screen down, which is what
+ * a blank page usually is.
+ */
 export async function orderReceipt(userId: string, id: string) {
   const order = await getOrder(userId, id);
   return {
+    orderId: order.id,
     code: order.code,
     issuedAt: new Date().toISOString(),
-    seller: order.publisherName,
-    buyer: order.address.fullName,
-    items: order.items.map((i) => ({
+    // No PDF is generated yet; the client treats null as "no download".
+    url: null,
+    lines: order.items.map((i) => ({
       title: i.title,
       quantity: i.quantity,
-      price: i.price,
-      lineTotal: round(i.price * i.quantity),
+      unitPrice: i.price,
+      total: round(i.price * i.quantity),
     })),
     subtotal: order.subtotal,
     deliveryFee: order.deliveryFee,
     discount: order.discount,
     total: order.total,
-    currency: 'AZN',
   };
 }
 
