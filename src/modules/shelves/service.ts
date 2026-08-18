@@ -121,7 +121,7 @@ export async function deleteShelf(userId: string, shelfId: string): Promise<Seri
   return listShelves(userId);
 }
 
-async function defaultShelvesByStatus(userId: string): Promise<Record<ShelfStatus, { id: string }>> {
+export async function defaultShelvesByStatus(userId: string): Promise<Record<ShelfStatus, { id: string }>> {
   const shelves = await prisma.shelf.findMany({
     where: { userId, isDefault: true },
     select: { id: true, status: true },
@@ -363,7 +363,7 @@ export async function updateProgress(
  * Guarded on the notification not already existing this year, or every book
  * finished after the target would send another one.
  */
-async function checkGoalReached(userId: string): Promise<void> {
+export async function checkGoalReached(userId: string): Promise<void> {
   const year = new Date().getFullYear();
   const goal = await prisma.readingGoal.findUnique({
     where: { userId_year: { userId, year } },
