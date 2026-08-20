@@ -1,0 +1,53 @@
+# Local PostgreSQL for development.
+#
+#   docker compose up -d      # start
+#   docker compose down       # stop, keep data
+#   docker compose down -v    # stop and wipe the volume
+#
+# The database is exposed on 5544, not the default 5432.
+#
+# A host PostgreSQL install takes 5432, and on at least one machine here it was
+# also already on 5433 — in that case Docker still reports the mapping as bound
+# while connections to localhost reach the *native* server, which fails
+# authentication with credentials that look correct. 5544 is far enough out of
+# the way to avoid that. If it is taken on your machine, change both this
+# mapping and DATABASE_URL in .env.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kitabdostu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kitabdostu
+      POSTGRES_PASSWORD: kitabdostu
+      POSTGRES_DB: kitabdostu
+      # Azerbaijani sorting; the catalogue is mostly Latin-script but the
+      # collation matters for ə, ı, ö, ü, ç, ş, ğ in ORDER BY.
+      LANG: en_US.utf8
+    ports:
+      - '5544:5432'
+    volumes:
+      - kitabdostu-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Migrations run immediately after `up`, so the compose file has to know
+      # when the server is genuinely accepting connections — the container being
+      # "running" is not the same thing.
+      test: ['CMD-SHELL', 'pg_isready -U kitabdostu -d kitabdostu']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional web UI for poking at the data. Not required by the API.
+  adminer:
+    image: adminer:latest
+    container_name: kitabdostu-adminer
+    restart: unless-stopped
+    ports:
+      - '8090:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  kitabdostu-pgdata:

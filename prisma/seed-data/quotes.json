@@ -1,0 +1,600 @@
+[
+  {
+    "id": "q_13",
+    "bookId": "b_30",
+    "book": {
+      "id": "b_30",
+      "title": "Böyük Getsbi",
+      "authorName": "F. Scott Fitzgerald",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10590366-M.jpg"
+    },
+    "user": {
+      "id": "u_9",
+      "username": "sebine",
+      "name": "Səbinə Vəliyeva",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=sebine&size=160"
+    },
+    "text": "Yol getdiyin qədər uzundur, dayandığın yerdə isə bitir.",
+    "page": 147,
+    "background": "plum",
+    "likesCount": 595,
+    "commentsCount": 52,
+    "isLiked": false,
+    "createdAt": "2026-07-29T21:08:04.711Z"
+  },
+  {
+    "id": "q_22",
+    "bookId": "b_602",
+    "book": {
+      "id": "b_602",
+      "title": "Holes",
+      "authorName": "Louis Sachar",
+      "coverUrl": "https://covers.openlibrary.org/b/id/19797-M.jpg"
+    },
+    "user": {
+      "id": "u_8",
+      "username": "kamran",
+      "name": "Kamran Nəbiyev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=kamran&size=160"
+    },
+    "text": "Yaddaş — insanın özü ilə apardığı yeganə vətəndir.",
+    "page": 114,
+    "background": "rose",
+    "likesCount": 515,
+    "commentsCount": 27,
+    "isLiked": false,
+    "createdAt": "2026-07-28T21:08:04.711Z"
+  },
+  {
+    "id": "q_1",
+    "bookId": "b_398",
+    "book": {
+      "id": "b_398",
+      "title": "Atomic Habits",
+      "authorName": "James Clear",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12539702-M.jpg"
+    },
+    "user": {
+      "id": "u_1",
+      "username": "leyla",
+      "name": "Leyla Məmmədova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leyla&size=160"
+    },
+    "text": "İnsan yalnız ürəyi ilə yaxşı görür. Əsas olan gözlə görünməzdir.",
+    "page": 284,
+    "background": "paper",
+    "likesCount": 1566,
+    "commentsCount": 39,
+    "isLiked": false,
+    "createdAt": "2026-07-22T21:08:04.711Z"
+  },
+  {
+    "id": "q_6",
+    "bookId": "b_18",
+    "book": {
+      "id": "b_18",
+      "title": "Şeyx Sənan",
+      "authorName": "Hüseyn Cavid",
+      "coverUrl": null
+    },
+    "user": {
+      "id": "u_2",
+      "username": "reshad",
+      "name": "Rəşad Quliyev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=reshad&size=160"
+    },
+    "text": "Ən uzun yol da ilk addımla başlayır, ən qalın kitab da ilk səhifə ilə.",
+    "page": 137,
+    "background": "rose",
+    "likesCount": 1508,
+    "commentsCount": 5,
+    "isLiked": false,
+    "createdAt": "2026-07-17T21:08:04.711Z"
+  },
+  {
+    "id": "q_16",
+    "bookId": "b_36",
+    "book": {
+      "id": "b_36",
+      "title": "Dune",
+      "authorName": "Frank Herbert",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7205924-M.jpg"
+    },
+    "user": {
+      "id": "u_4",
+      "username": "tural",
+      "name": "Tural Həsənov",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=tural&size=160"
+    },
+    "text": "İnsanın ən böyük düşməni öz vərdişləridir.",
+    "page": 201,
+    "background": "dusk",
+    "likesCount": 469,
+    "commentsCount": 7,
+    "isLiked": false,
+    "createdAt": "2026-07-11T21:08:04.711Z"
+  },
+  {
+    "id": "q_7",
+    "bookId": "b_27",
+    "book": {
+      "id": "b_27",
+      "title": "Qürur və qərəz",
+      "authorName": "Jane Austen",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14348537-M.jpg"
+    },
+    "user": {
+      "id": "u_5",
+      "username": "aysel",
+      "name": "Aysel Kərimli",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aysel&size=160"
+    },
+    "text": "Sevgi baxışlarla başlayır, sözlə davam edir, susmaqla yaşayır.",
+    "page": 291,
+    "background": "moss",
+    "likesCount": 1392,
+    "commentsCount": 54,
+    "isLiked": false,
+    "createdAt": "2026-07-07T21:08:04.711Z"
+  },
+  {
+    "id": "q_15",
+    "bookId": "b_298",
+    "book": {
+      "id": "b_298",
+      "title": "The Shining",
+      "authorName": "Stephen King",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12376585-M.jpg"
+    },
+    "user": {
+      "id": "u_1",
+      "username": "leyla",
+      "name": "Leyla Məmmədova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leyla&size=160"
+    },
+    "text": "Cəsarət qorxunun olmaması deyil, qorxuya baxmayaraq addım atmaqdır.",
+    "page": 207,
+    "background": "moss",
+    "likesCount": 1517,
+    "commentsCount": 17,
+    "isLiked": true,
+    "createdAt": "2026-07-01T21:08:04.711Z"
+  },
+  {
+    "id": "q_26",
+    "bookId": "b_248",
+    "book": {
+      "id": "b_248",
+      "title": "Elon Musk",
+      "authorName": "Ashlee Vance",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8463846-M.jpg"
+    },
+    "user": {
+      "id": "u_6",
+      "username": "elvin",
+      "name": "Elvin Bayramov",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=elvin&size=160"
+    },
+    "text": "Sabahı düşünməyən adam bu günü də tam yaşaya bilmir.",
+    "page": 273,
+    "background": "ember",
+    "likesCount": 1577,
+    "commentsCount": 59,
+    "isLiked": false,
+    "createdAt": "2026-06-20T21:08:04.711Z"
+  },
+  {
+    "id": "q_4",
+    "bookId": "b_19",
+    "book": {
+      "id": "b_19",
+      "title": "Nar bağı",
+      "authorName": "Əkrəm Əylisli",
+      "coverUrl": null
+    },
+    "user": {
+      "id": "u_10",
+      "username": "orxan",
+      "name": "Orxan Rzayev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=orxan&size=160"
+    },
+    "text": "Kitablar dostların ən sakitidir; onlar heç vaxt üzünü çevirmir.",
+    "page": 79,
+    "background": "sea",
+    "likesCount": 497,
+    "commentsCount": 29,
+    "isLiked": false,
+    "createdAt": "2026-06-19T21:08:04.711Z"
+  },
+  {
+    "id": "q_19",
+    "bookId": "b_153",
+    "book": {
+      "id": "b_153",
+      "title": "Alice's Adventures in Wonderland",
+      "authorName": "Lewis Carroll",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10527843-M.jpg"
+    },
+    "user": {
+      "id": "u_13",
+      "username": "aynur",
+      "name": "Aynur Hüseynova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aynur&size=160"
+    },
+    "text": "Həyat geriyə baxaraq anlaşılır, amma irəli baxaraq yaşanılır.",
+    "page": 47,
+    "background": "ink",
+    "likesCount": 1746,
+    "commentsCount": 14,
+    "isLiked": false,
+    "createdAt": "2026-06-09T21:08:04.711Z"
+  },
+  {
+    "id": "q_8",
+    "bookId": "b_806",
+    "book": {
+      "id": "b_806",
+      "title": "1. Milletlerarası Mevlâna Kongresi",
+      "authorName": "International Mevlâna Congress (1st 1987 Selçuk University)",
+      "coverUrl": "https://covers.openlibrary.org/b/id/4929388-M.jpg"
+    },
+    "user": {
+      "id": "u_8",
+      "username": "kamran",
+      "name": "Kamran Nəbiyev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=kamran&size=160"
+    },
+    "text": "Vaxt heç nəyi sağaltmır; sadəcə yaddaşı yumşaldır.",
+    "page": 40,
+    "background": "dusk",
+    "likesCount": 855,
+    "commentsCount": 53,
+    "isLiked": false,
+    "createdAt": "2026-06-01T21:08:04.711Z"
+  },
+  {
+    "id": "q_14",
+    "bookId": "b_22",
+    "book": {
+      "id": "b_22",
+      "title": "Heyvanıstan",
+      "authorName": "George Orwell",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11261770-M.jpg"
+    },
+    "user": {
+      "id": "u_12",
+      "username": "ferid",
+      "name": "Fərid Musayev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=ferid&size=160"
+    },
+    "text": "Kitab oxumaq başqasının ağlı ilə düşünməkdir; düşünmək isə öz ağlınla oxumaqdır.",
+    "page": 106,
+    "background": "rose",
+    "likesCount": 143,
+    "commentsCount": 24,
+    "isLiked": false,
+    "createdAt": "2026-05-31T21:08:04.711Z"
+  },
+  {
+    "id": "q_21",
+    "bookId": "b_142",
+    "book": {
+      "id": "b_142",
+      "title": "Coraline",
+      "authorName": "Neil Gaiman",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14171421-M.jpg"
+    },
+    "user": {
+      "id": "u_5",
+      "username": "aysel",
+      "name": "Aysel Kərimli",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aysel&size=160"
+    },
+    "text": "Ümid — yuxusuz gecələrin yeganə yoldaşıdır.",
+    "page": 92,
+    "background": "plum",
+    "likesCount": 589,
+    "commentsCount": 7,
+    "isLiked": false,
+    "createdAt": "2026-05-29T21:08:04.711Z"
+  },
+  {
+    "id": "q_3",
+    "bookId": "b_48",
+    "book": {
+      "id": "b_48",
+      "title": "Sapiens: Bəşəriyyətin qısa tarixi",
+      "authorName": "Yuval Noah Harari",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8634250-M.jpg"
+    },
+    "user": {
+      "id": "u_7",
+      "username": "gunel",
+      "name": "Günel Səfərova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=gunel&size=160"
+    },
+    "text": "Hər kəs dünyanı dəyişdirmək istəyir, amma heç kim özünü dəyişdirmək istəmir.",
+    "page": 87,
+    "background": "ink",
+    "likesCount": 1579,
+    "commentsCount": 26,
+    "isLiked": false,
+    "createdAt": "2026-05-27T21:08:04.711Z"
+  },
+  {
+    "id": "q_23",
+    "bookId": "b_505",
+    "book": {
+      "id": "b_505",
+      "title": "Freakonomics",
+      "authorName": "Steven D. Levitt",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11172914-M.jpg"
+    },
+    "user": {
+      "id": "u_11",
+      "username": "leman",
+      "name": "Ləman Abbasova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leman&size=160"
+    },
+    "text": "Bir sözün ağırlığını ancaq onu deməyi bacarmayan bilir.",
+    "page": 132,
+    "background": "moss",
+    "likesCount": 887,
+    "commentsCount": 6,
+    "isLiked": false,
+    "createdAt": "2026-05-23T21:08:04.711Z"
+  },
+  {
+    "id": "q_9",
+    "bookId": "b_53",
+    "book": {
+      "id": "b_53",
+      "title": "Zəngin ata, kasıb ata",
+      "authorName": "Robert Kiyosaki",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8315603-M.jpg"
+    },
+    "user": {
+      "id": "u_11",
+      "username": "leman",
+      "name": "Ləman Abbasova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leman&size=160"
+    },
+    "text": "Xoşbəxtlik — arzuladığını almaq deyil, sahib olduğunu qiymətləndirməkdir.",
+    "page": 71,
+    "background": "paper",
+    "likesCount": 104,
+    "commentsCount": 25,
+    "isLiked": false,
+    "createdAt": "2026-05-19T21:08:04.711Z"
+  },
+  {
+    "id": "q_17",
+    "bookId": "b_318",
+    "book": {
+      "id": "b_318",
+      "title": "Adventures of Huckleberry Finn",
+      "authorName": "Mark Twain",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8157718-M.jpg"
+    },
+    "user": {
+      "id": "u_7",
+      "username": "gunel",
+      "name": "Günel Səfərova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=gunel&size=160"
+    },
+    "text": "Doğru sual tapmaq, düzgün cavabdan qat-qat çətindir.",
+    "page": 139,
+    "background": "paper",
+    "likesCount": 940,
+    "commentsCount": 52,
+    "isLiked": false,
+    "createdAt": "2026-05-19T21:08:04.711Z"
+  },
+  {
+    "id": "q_25",
+    "bookId": "b_62",
+    "book": {
+      "id": "b_62",
+      "title": "The Adventures of Sherlock Holmes [12 stories]",
+      "authorName": "Arthur Conan Doyle",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6717853-M.jpg"
+    },
+    "user": {
+      "id": "u_3",
+      "username": "nigar",
+      "name": "Nigar Əliyeva",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=nigar&size=160"
+    },
+    "text": "Dünyanı dəyişən böyük ideyalar həmişə kiçik otaqlarda doğulub.",
+    "page": 158,
+    "background": "paper",
+    "likesCount": 624,
+    "commentsCount": 3,
+    "isLiked": true,
+    "createdAt": "2026-05-10T21:08:04.711Z"
+  },
+  {
+    "id": "q_12",
+    "bookId": "b_34",
+    "book": {
+      "id": "b_34",
+      "title": "Hobbit",
+      "authorName": "J. R. R. Tolkien",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14627509-M.jpg"
+    },
+    "user": {
+      "id": "u_6",
+      "username": "elvin",
+      "name": "Elvin Bayramov",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=elvin&size=160"
+    },
+    "text": "Susmaq bəzən ən uca səslə deyilən cümlədir.",
+    "page": 203,
+    "background": "sea",
+    "likesCount": 1207,
+    "commentsCount": 18,
+    "isLiked": false,
+    "createdAt": "2026-05-03T21:08:04.711Z"
+  },
+  {
+    "id": "q_20",
+    "bookId": "b_45",
+    "book": {
+      "id": "b_45",
+      "title": "Benim Adım Kırmızı",
+      "authorName": "Orhan Pamuk",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1054459-M.jpg"
+    },
+    "user": {
+      "id": "u_2",
+      "username": "reshad",
+      "name": "Rəşad Quliyev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=reshad&size=160"
+    },
+    "text": "Nə qədər az şeyə ehtiyacın varsa, o qədər azadsan.",
+    "page": 255,
+    "background": "sea",
+    "likesCount": 1036,
+    "commentsCount": 28,
+    "isLiked": false,
+    "createdAt": "2026-05-02T21:08:04.711Z"
+  },
+  {
+    "id": "q_2",
+    "bookId": "b_7",
+    "book": {
+      "id": "b_7",
+      "title": "Sehrbazlar dərəsi",
+      "authorName": "Kamal Abdulla",
+      "coverUrl": null
+    },
+    "user": {
+      "id": "u_4",
+      "username": "tural",
+      "name": "Tural Həsənov",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=tural&size=160"
+    },
+    "text": "Kim keçmişi idarə edirsə, gələcəyi də idarə edir; kim indini idarə edirsə, keçmişi idarə edir.",
+    "page": 63,
+    "background": "ember",
+    "likesCount": 1705,
+    "commentsCount": 6,
+    "isLiked": false,
+    "createdAt": "2026-05-01T21:08:04.711Z"
+  },
+  {
+    "id": "q_5",
+    "bookId": "b_26",
+    "book": {
+      "id": "b_26",
+      "title": "Kiçik Şahzadə",
+      "authorName": "Antoine de Saint-Exupéry",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10708272-M.jpg"
+    },
+    "user": {
+      "id": "u_13",
+      "username": "aynur",
+      "name": "Aynur Hüseynova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aynur&size=160"
+    },
+    "text": "Bir insanı tanımaq istəyirsənsə, oxuduğu kitablara bax.",
+    "page": 77,
+    "background": "plum",
+    "likesCount": 936,
+    "commentsCount": 51,
+    "isLiked": false,
+    "createdAt": "2026-04-30T21:08:04.711Z"
+  },
+  {
+    "id": "q_10",
+    "bookId": "b_14",
+    "book": {
+      "id": "b_14",
+      "title": "Hophopnamə",
+      "authorName": "Mirzə Ələkbər Sabir",
+      "coverUrl": null
+    },
+    "user": {
+      "id": "u_14",
+      "username": "vuqar",
+      "name": "Vüqar Salmanov",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=vuqar&size=160"
+    },
+    "text": "Qorxu ağlın ən yaxşı müəllimidir, amma ən pis məsləhətçisidir.",
+    "page": 241,
+    "background": "ember",
+    "likesCount": 1135,
+    "commentsCount": 57,
+    "isLiked": false,
+    "createdAt": "2026-04-21T21:08:04.711Z"
+  },
+  {
+    "id": "q_11",
+    "bookId": "b_125",
+    "book": {
+      "id": "b_125",
+      "title": "The Lightning Thief",
+      "authorName": "Rick Riordan",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7239831-M.jpg"
+    },
+    "user": {
+      "id": "u_3",
+      "username": "nigar",
+      "name": "Nigar Əliyeva",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=nigar&size=160"
+    },
+    "text": "Hər gecənin bir səhəri var, amma hər səhər eyni adamı oyatmır.",
+    "page": 160,
+    "background": "ink",
+    "likesCount": 394,
+    "commentsCount": 57,
+    "isLiked": false,
+    "createdAt": "2026-04-17T21:08:04.711Z"
+  },
+  {
+    "id": "q_24",
+    "bookId": "b_187",
+    "book": {
+      "id": "b_187",
+      "title": "The Hitchhiker's Guide to the Galaxy",
+      "authorName": "Douglas Adams",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12986869-M.jpg"
+    },
+    "user": {
+      "id": "u_14",
+      "username": "vuqar",
+      "name": "Vüqar Salmanov",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=vuqar&size=160"
+    },
+    "text": "Oxumaq ruhun idmanıdır; ondan imtina edən yavaş-yavaş kiçilir.",
+    "page": 11,
+    "background": "dusk",
+    "likesCount": 484,
+    "commentsCount": 57,
+    "isLiked": false,
+    "createdAt": "2026-04-13T21:08:04.711Z"
+  },
+  {
+    "id": "q_18",
+    "bookId": "b_669",
+    "book": {
+      "id": "b_669",
+      "title": "Watchmen",
+      "authorName": "Alan Moore",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7774899-M.jpg"
+    },
+    "user": {
+      "id": "u_10",
+      "username": "orxan",
+      "name": "Orxan Rzayev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=orxan&size=160"
+    },
+    "text": "Balaca işləri böyük sevgi ilə görmək lazımdır.",
+    "page": 55,
+    "background": "ember",
+    "likesCount": 432,
+    "commentsCount": 13,
+    "isLiked": false,
+    "createdAt": "2026-04-10T21:08:04.711Z"
+  }
+]

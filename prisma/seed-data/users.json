@@ -1,0 +1,914 @@
+[
+  {
+    "id": "u_1",
+    "username": "leyla",
+    "name": "Leyla Məmmədova",
+    "email": "leyla@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leyla&size=160",
+    "bio": "Kitab oxumaq — başqasının həyatını yaşamaqdır. Klassika və detektiv sevirəm.",
+    "role": "user",
+    "createdAt": "2024-12-23T21:08:04.711Z",
+    "followersCount": 970,
+    "followingCount": 181,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 54,
+      "pagesRead": 20250,
+      "reviewsCount": 21,
+      "quotesCount": 30,
+      "streakDays": 105,
+      "longestStreak": 180,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "poetry",
+          "count": 13
+        },
+        {
+          "genre": "history",
+          "count": 15
+        },
+        {
+          "genre": "children",
+          "count": 24
+        },
+        {
+          "genre": "scifi",
+          "count": 15
+        }
+      ],
+      "weeklyPages": [
+        0,
+        15,
+        26,
+        71,
+        62,
+        13,
+        23
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 36,
+      "completed": 9
+    },
+    "favoriteGenres": [
+      "poetry",
+      "history",
+      "children",
+      "scifi"
+    ],
+    "favoriteAuthorIds": [
+      "au_186"
+    ],
+    "walletBalance": 43.49,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_2",
+    "username": "reshad",
+    "name": "Rəşad Quliyev",
+    "email": "reshad@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=reshad&size=160",
+    "bio": "Elmi-populyar ədəbiyyat həvəskarı. İldə 40 kitab hədəfim var.",
+    "role": "user",
+    "createdAt": "2024-07-30T21:08:04.711Z",
+    "followersCount": 34,
+    "followingCount": 253,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 51,
+      "pagesRead": 20094,
+      "reviewsCount": 0,
+      "quotesCount": 52,
+      "streakDays": 11,
+      "longestStreak": 25,
+      "readToday": false,
+      "genreDistribution": [
+        {
+          "genre": "children",
+          "count": 19
+        },
+        {
+          "genre": "novel",
+          "count": 19
+        },
+        {
+          "genre": "history",
+          "count": 13
+        }
+      ],
+      "weeklyPages": [
+        29,
+        69,
+        93,
+        0,
+        12,
+        74,
+        48
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 36,
+      "completed": 23
+    },
+    "favoriteGenres": [
+      "children",
+      "novel",
+      "history"
+    ],
+    "favoriteAuthorIds": [
+      "au_431"
+    ],
+    "walletBalance": 5.21,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_3",
+    "username": "nigar",
+    "name": "Nigar Əliyeva",
+    "email": "nigar@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=nigar&size=160",
+    "bio": "Poeziya və Azərbaycan ədəbiyyatı. Sitat toplamağı sevirəm.",
+    "role": "user",
+    "createdAt": "2025-05-27T21:08:04.711Z",
+    "followersCount": 307,
+    "followingCount": 48,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 68,
+      "pagesRead": 23936,
+      "reviewsCount": 18,
+      "quotesCount": 14,
+      "streakDays": 6,
+      "longestStreak": 38,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "business",
+          "count": 14
+        },
+        {
+          "genre": "biography",
+          "count": 16
+        },
+        {
+          "genre": "classic",
+          "count": 9
+        },
+        {
+          "genre": "science",
+          "count": 22
+        },
+        {
+          "genre": "selfHelp",
+          "count": 8
+        }
+      ],
+      "weeklyPages": [
+        32,
+        29,
+        77,
+        87,
+        87,
+        10,
+        68
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 12,
+      "completed": 13
+    },
+    "favoriteGenres": [
+      "business",
+      "biography",
+      "classic",
+      "science",
+      "selfHelp"
+    ],
+    "favoriteAuthorIds": [
+      "au_81"
+    ],
+    "walletBalance": 20.81,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_4",
+    "username": "tural",
+    "name": "Tural Həsənov",
+    "email": "tural@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=tural&size=160",
+    "bio": "Fantastika, Tolkien və Herbert. Bakı, 25 yaş.",
+    "role": "user",
+    "createdAt": "2025-06-27T21:08:04.711Z",
+    "followersCount": 348,
+    "followingCount": 10,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 74,
+      "pagesRead": 27232,
+      "reviewsCount": 33,
+      "quotesCount": 31,
+      "streakDays": 93,
+      "longestStreak": 96,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "selfHelp",
+          "count": 27
+        },
+        {
+          "genre": "biography",
+          "count": 34
+        },
+        {
+          "genre": "mystery",
+          "count": 35
+        },
+        {
+          "genre": "science",
+          "count": 23
+        }
+      ],
+      "weeklyPages": [
+        12,
+        17,
+        86,
+        56,
+        28,
+        13,
+        20
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 20,
+      "completed": 15
+    },
+    "favoriteGenres": [
+      "selfHelp",
+      "biography",
+      "mystery",
+      "science"
+    ],
+    "favoriteAuthorIds": [
+      "au_257"
+    ],
+    "walletBalance": 5.07,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_5",
+    "username": "aysel",
+    "name": "Aysel Kərimli",
+    "email": "aysel@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aysel&size=160",
+    "bio": "Psixologiya və şəxsi inkişaf kitabları. Hər səhər 30 səhifə.",
+    "role": "user",
+    "createdAt": "2026-04-07T21:08:04.711Z",
+    "followersCount": 1083,
+    "followingCount": 306,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 33,
+      "pagesRead": 11220,
+      "reviewsCount": 36,
+      "quotesCount": 66,
+      "streakDays": 3,
+      "longestStreak": 48,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "history",
+          "count": 12
+        },
+        {
+          "genre": "classic",
+          "count": 15
+        },
+        {
+          "genre": "scifi",
+          "count": 6
+        },
+        {
+          "genre": "mystery",
+          "count": 7
+        }
+      ],
+      "weeklyPages": [
+        0,
+        59,
+        21,
+        0,
+        85,
+        67,
+        58
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 50,
+      "completed": 16
+    },
+    "favoriteGenres": [
+      "history",
+      "classic",
+      "scifi",
+      "mystery"
+    ],
+    "favoriteAuthorIds": [
+      "au_390"
+    ],
+    "walletBalance": 12.96,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_6",
+    "username": "elvin",
+    "name": "Elvin Bayramov",
+    "email": "elvin@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=elvin&size=160",
+    "bio": "Tarix və bioqrafiya. Kitab rəfim evimin ən vacib mebelidir.",
+    "role": "user",
+    "createdAt": "2023-09-23T21:08:04.711Z",
+    "followersCount": 24,
+    "followingCount": 126,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 21,
+      "pagesRead": 5376,
+      "reviewsCount": 9,
+      "quotesCount": 57,
+      "streakDays": 64,
+      "longestStreak": 140,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "classic",
+          "count": 3
+        },
+        {
+          "genre": "history",
+          "count": 8
+        },
+        {
+          "genre": "business",
+          "count": 2
+        },
+        {
+          "genre": "biography",
+          "count": 9
+        },
+        {
+          "genre": "psychology",
+          "count": 5
+        }
+      ],
+      "weeklyPages": [
+        50,
+        18,
+        42,
+        38,
+        76,
+        43,
+        58
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 24,
+      "completed": 21
+    },
+    "favoriteGenres": [
+      "classic",
+      "history",
+      "business",
+      "biography",
+      "psychology"
+    ],
+    "favoriteAuthorIds": [
+      "au_316",
+      "au_456"
+    ],
+    "walletBalance": 31.51,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_7",
+    "username": "gunel",
+    "name": "Günel Səfərova",
+    "email": "gunel@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=gunel&size=160",
+    "bio": "Murakami oxucusuyam. Kitab klubunun təşkilatçısı.",
+    "role": "user",
+    "createdAt": "2023-05-07T21:08:04.711Z",
+    "followersCount": 221,
+    "followingCount": 122,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 69,
+      "pagesRead": 20769,
+      "reviewsCount": 21,
+      "quotesCount": 31,
+      "streakDays": 29,
+      "longestStreak": 105,
+      "readToday": false,
+      "genreDistribution": [
+        {
+          "genre": "business",
+          "count": 9
+        },
+        {
+          "genre": "poetry",
+          "count": 33
+        },
+        {
+          "genre": "science",
+          "count": 27
+        },
+        {
+          "genre": "psychology",
+          "count": 19
+        }
+      ],
+      "weeklyPages": [
+        36,
+        87,
+        12,
+        24,
+        25,
+        49,
+        20
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 50,
+      "completed": 21
+    },
+    "favoriteGenres": [
+      "business",
+      "poetry",
+      "science",
+      "psychology"
+    ],
+    "favoriteAuthorIds": [
+      "au_333"
+    ],
+    "walletBalance": 4.98,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_8",
+    "username": "kamran",
+    "name": "Kamran Nəbiyev",
+    "email": "kamran@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=kamran&size=160",
+    "bio": "Biznes ədəbiyyatı və podcast həvəskarı.",
+    "role": "user",
+    "createdAt": "2026-05-06T21:08:04.711Z",
+    "followersCount": 452,
+    "followingCount": 226,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 54,
+      "pagesRead": 17226,
+      "reviewsCount": 35,
+      "quotesCount": 32,
+      "streakDays": 8,
+      "longestStreak": 97,
+      "readToday": false,
+      "genreDistribution": [
+        {
+          "genre": "children",
+          "count": 14
+        },
+        {
+          "genre": "philosophy",
+          "count": 24
+        },
+        {
+          "genre": "psychology",
+          "count": 21
+        }
+      ],
+      "weeklyPages": [
+        84,
+        29,
+        56,
+        0,
+        84,
+        66,
+        39
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 50,
+      "completed": 11
+    },
+    "favoriteGenres": [
+      "children",
+      "philosophy",
+      "psychology"
+    ],
+    "favoriteAuthorIds": [
+      "au_403",
+      "au_348",
+      "au_369"
+    ],
+    "walletBalance": 58.27,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_9",
+    "username": "sebine",
+    "name": "Səbinə Vəliyeva",
+    "email": "sebine@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=sebine&size=160",
+    "bio": "Uşaq ədəbiyyatı müəllimiyəm. Klassikaları yenidən oxuyuram.",
+    "role": "user",
+    "createdAt": "2023-05-17T21:08:04.711Z",
+    "followersCount": 159,
+    "followingCount": 22,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 7,
+      "pagesRead": 2646,
+      "reviewsCount": 15,
+      "quotesCount": 27,
+      "streakDays": 74,
+      "longestStreak": 80,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "children",
+          "count": 3
+        },
+        {
+          "genre": "scifi",
+          "count": 2
+        },
+        {
+          "genre": "psychology",
+          "count": 3
+        }
+      ],
+      "weeklyPages": [
+        21,
+        41,
+        60,
+        44,
+        39,
+        64,
+        40
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 50,
+      "completed": 7
+    },
+    "favoriteGenres": [
+      "children",
+      "scifi",
+      "psychology"
+    ],
+    "favoriteAuthorIds": [
+      "au_434",
+      "au_327"
+    ],
+    "walletBalance": 4.91,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_10",
+    "username": "orxan",
+    "name": "Orxan Rzayev",
+    "email": "orxan@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=orxan&size=160",
+    "bio": "Fəlsəfə, Dostoyevski, uzun gecələr.",
+    "role": "user",
+    "createdAt": "2024-02-26T21:08:04.711Z",
+    "followersCount": 420,
+    "followingCount": 345,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 60,
+      "pagesRead": 22260,
+      "reviewsCount": 31,
+      "quotesCount": 55,
+      "streakDays": 24,
+      "longestStreak": 94,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "biography",
+          "count": 8
+        },
+        {
+          "genre": "selfHelp",
+          "count": 9
+        },
+        {
+          "genre": "poetry",
+          "count": 3
+        }
+      ],
+      "weeklyPages": [
+        77,
+        24,
+        55,
+        66,
+        15,
+        0,
+        36
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 20,
+      "completed": 6
+    },
+    "favoriteGenres": [
+      "biography",
+      "selfHelp",
+      "poetry"
+    ],
+    "favoriteAuthorIds": [
+      "au_206",
+      "au_560",
+      "au_185",
+      "au_145"
+    ],
+    "walletBalance": 39.52,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_11",
+    "username": "leman",
+    "name": "Ləman Abbasova",
+    "email": "leman@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leman&size=160",
+    "bio": "Şeir yazıram, roman oxuyuram.",
+    "role": "user",
+    "createdAt": "2026-03-21T21:08:04.711Z",
+    "followersCount": 1007,
+    "followingCount": 265,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 18,
+      "pagesRead": 3402,
+      "reviewsCount": 11,
+      "quotesCount": 23,
+      "streakDays": 34,
+      "longestStreak": 40,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "selfHelp",
+          "count": 8
+        },
+        {
+          "genre": "biography",
+          "count": 9
+        },
+        {
+          "genre": "science",
+          "count": 4
+        }
+      ],
+      "weeklyPages": [
+        80,
+        72,
+        63,
+        82,
+        0,
+        0,
+        13
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 20,
+      "completed": 2
+    },
+    "favoriteGenres": [
+      "selfHelp",
+      "biography",
+      "science"
+    ],
+    "favoriteAuthorIds": [
+      "au_490",
+      "au_266"
+    ],
+    "walletBalance": 11.7,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_12",
+    "username": "ferid",
+    "name": "Fərid Musayev",
+    "email": "ferid@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=ferid&size=160",
+    "bio": "Detektiv janrının fanatı. Agatha Christie kolleksiyaçısı.",
+    "role": "user",
+    "createdAt": "2024-12-27T21:08:04.711Z",
+    "followersCount": 472,
+    "followingCount": 314,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 79,
+      "pagesRead": 28914,
+      "reviewsCount": 5,
+      "quotesCount": 17,
+      "streakDays": 83,
+      "longestStreak": 100,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "business",
+          "count": 12
+        },
+        {
+          "genre": "poetry",
+          "count": 16
+        },
+        {
+          "genre": "novel",
+          "count": 22
+        },
+        {
+          "genre": "philosophy",
+          "count": 10
+        }
+      ],
+      "weeklyPages": [
+        36,
+        0,
+        37,
+        25,
+        11,
+        62,
+        27
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 50,
+      "completed": 10
+    },
+    "favoriteGenres": [
+      "business",
+      "poetry",
+      "novel",
+      "philosophy"
+    ],
+    "favoriteAuthorIds": [
+      "au_528",
+      "au_322",
+      "au_360",
+      "au_167"
+    ],
+    "walletBalance": 17.26,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_13",
+    "username": "aynur",
+    "name": "Aynur Hüseynova",
+    "email": "aynur@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aynur&size=160",
+    "bio": "Türk ədəbiyyatı və Sabahattin Ali.",
+    "role": "user",
+    "createdAt": "2025-01-25T21:08:04.711Z",
+    "followersCount": 853,
+    "followingCount": 245,
+    "isFollowing": false,
+    "stats": {
+      "booksRead": 34,
+      "pagesRead": 12376,
+      "reviewsCount": 34,
+      "quotesCount": 47,
+      "streakDays": 80,
+      "longestStreak": 128,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "business",
+          "count": 7
+        },
+        {
+          "genre": "fantasy",
+          "count": 6
+        },
+        {
+          "genre": "history",
+          "count": 9
+        },
+        {
+          "genre": "biography",
+          "count": 5
+        },
+        {
+          "genre": "mystery",
+          "count": 15
+        }
+      ],
+      "weeklyPages": [
+        24,
+        0,
+        30,
+        37,
+        0,
+        64,
+        95
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 36,
+      "completed": 6
+    },
+    "favoriteGenres": [
+      "business",
+      "fantasy",
+      "history",
+      "biography",
+      "mystery"
+    ],
+    "favoriteAuthorIds": [
+      "au_100",
+      "au_296"
+    ],
+    "walletBalance": 19.95,
+    "twoFactorEnabled": false
+  },
+  {
+    "id": "u_14",
+    "username": "vuqar",
+    "name": "Vüqar Salmanov",
+    "email": "vuqar@kitabdostu.az",
+    "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=vuqar&size=160",
+    "bio": "Elm, kosmos, Hawking.",
+    "role": "user",
+    "createdAt": "2023-07-06T21:08:04.711Z",
+    "followersCount": 1135,
+    "followingCount": 313,
+    "isFollowing": true,
+    "stats": {
+      "booksRead": 39,
+      "pagesRead": 8112,
+      "reviewsCount": 11,
+      "quotesCount": 46,
+      "streakDays": 4,
+      "longestStreak": 47,
+      "readToday": true,
+      "genreDistribution": [
+        {
+          "genre": "classic",
+          "count": 10
+        },
+        {
+          "genre": "psychology",
+          "count": 15
+        },
+        {
+          "genre": "poetry",
+          "count": 3
+        },
+        {
+          "genre": "philosophy",
+          "count": 4
+        }
+      ],
+      "weeklyPages": [
+        0,
+        56,
+        23,
+        0,
+        0,
+        79,
+        28
+      ]
+    },
+    "goal": {
+      "year": 2026,
+      "target": 24,
+      "completed": 21
+    },
+    "favoriteGenres": [
+      "classic",
+      "psychology",
+      "poetry",
+      "philosophy"
+    ],
+    "favoriteAuthorIds": [
+      "au_512"
+    ],
+    "walletBalance": 43.33,
+    "twoFactorEnabled": false
+  }
+]

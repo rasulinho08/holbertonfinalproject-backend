@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ef28e8e7-7f3f-43d8-9f62-4985aacb29b0"
+      }
+    },
+    "android": {
+      "package": "com.rasul028.kitabdostubackend"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "bm_1",
+    "buddyReadId": "br_1",
+    "user": {
+      "id": "u_10",
+      "username": "orxan",
+      "name": "Orxan Rzayev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=orxan&size=160"
+    },
+    "body": "İlk hissəni bitirdim, gözlədiyimdən sürətli getdi. 2-ci hissəyə keçirəm.",
+    "chapter": 2,
+    "createdAt": "2026-07-29T21:08:04.711Z"
+  },
+  {
+    "id": "bm_2",
+    "buddyReadId": "br_1",
+    "user": {
+      "id": "u_1",
+      "username": "leyla",
+      "name": "Leyla Məmmədova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=leyla&size=160"
+    },
+    "body": "Mən hələ 1-ci hissədəyəm, spoyler yazmayın 🙂",
+    "chapter": 1,
+    "createdAt": "2026-07-30T21:08:04.711Z"
+  },
+  {
+    "id": "bm_3",
+    "buddyReadId": "br_1",
+    "user": {
+      "id": "u_3",
+      "username": "nigar",
+      "name": "Nigar Əliyeva",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=nigar&size=160"
+    },
+    "body": "Orta hissədəki dönüş nöqtəsi haqqında sonda ayrıca danışaq.",
+    "chapter": 3,
+    "createdAt": "2026-08-03T21:08:04.711Z"
+  },
+  {
+    "id": "bm_4",
+    "buddyReadId": "br_1",
+    "user": {
+      "id": "u_10",
+      "username": "orxan",
+      "name": "Orxan Rzayev",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=orxan&size=160"
+    },
+    "body": "Həftə sonu 4-cü hissəni bitirməyi planlaşdırıram, qoşulan varmı?",
+    "chapter": 4,
+    "createdAt": "2026-08-06T21:08:04.711Z"
+  },
+  {
+    "id": "bm_5",
+    "buddyReadId": "br_2",
+    "user": {
+      "id": "u_7",
+      "username": "gunel",
+      "name": "Günel Səfərova",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=gunel&size=160"
+    },
+    "body": "Təsvirlər möhtəşəmdir, oxuyarkən şəhəri gözünün önündə canlandırırsan.",
+    "chapter": 1,
+    "createdAt": "2026-08-04T21:08:04.711Z"
+  },
+  {
+    "id": "bm_6",
+    "buddyReadId": "br_2",
+    "user": {
+      "id": "u_5",
+      "username": "aysel",
+      "name": "Aysel Kərimli",
+      "avatarUrl": "https://api.dicebear.com/9.x/thumbs/png?seed=aysel&size=160"
+    },
+    "body": "Razıyam. İkinci personaj gözlədiyimdən güclü çıxdı.",
+    "chapter": 2,
+    "createdAt": "2026-08-05T21:08:04.711Z"
+  }
+]

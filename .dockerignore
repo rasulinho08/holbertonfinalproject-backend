@@ -1,0 +1,32 @@
+# Anything not needed to build or run the image.
+#
+# node_modules matters most: copying the host's would ship Windows-built native
+# binaries (argon2, Prisma engines) into a Linux image, where they do not load.
+
+node_modules
+dist
+
+.git
+.gitignore
+
+.env
+.env.*
+!.env.example
+
+# Local-only tooling
+docker-compose.yml
+scripts/smoke*.mjs
+
+# Docs
+*.md
+!README.md
+
+# Editors and OS
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Test output
+coverage
+tests

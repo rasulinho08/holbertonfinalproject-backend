@@ -1,0 +1,408 @@
+[
+  {
+    "id": "sh_1_1",
+    "userId": "u_1",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_1_2",
+    "userId": "u_1",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_1_3",
+    "userId": "u_1",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_1_4",
+    "userId": "u_1",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_2_1",
+    "userId": "u_2",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_2_2",
+    "userId": "u_2",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_2_3",
+    "userId": "u_2",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_2_4",
+    "userId": "u_2",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_3_1",
+    "userId": "u_3",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_3_2",
+    "userId": "u_3",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_3_3",
+    "userId": "u_3",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_3_4",
+    "userId": "u_3",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_4_1",
+    "userId": "u_4",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_4_2",
+    "userId": "u_4",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_4_3",
+    "userId": "u_4",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_4_4",
+    "userId": "u_4",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_5_1",
+    "userId": "u_5",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_5_2",
+    "userId": "u_5",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_5_3",
+    "userId": "u_5",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_5_4",
+    "userId": "u_5",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_6_1",
+    "userId": "u_6",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_6_2",
+    "userId": "u_6",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_6_3",
+    "userId": "u_6",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_6_4",
+    "userId": "u_6",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_7_1",
+    "userId": "u_7",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_7_2",
+    "userId": "u_7",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_7_3",
+    "userId": "u_7",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_7_4",
+    "userId": "u_7",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_8_1",
+    "userId": "u_8",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_8_2",
+    "userId": "u_8",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_8_3",
+    "userId": "u_8",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_8_4",
+    "userId": "u_8",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_9_1",
+    "userId": "u_9",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_9_2",
+    "userId": "u_9",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_9_3",
+    "userId": "u_9",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_9_4",
+    "userId": "u_9",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_10_1",
+    "userId": "u_10",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_10_2",
+    "userId": "u_10",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_10_3",
+    "userId": "u_10",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_10_4",
+    "userId": "u_10",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_11_1",
+    "userId": "u_11",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_11_2",
+    "userId": "u_11",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_11_3",
+    "userId": "u_11",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_11_4",
+    "userId": "u_11",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_12_1",
+    "userId": "u_12",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_12_2",
+    "userId": "u_12",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_12_3",
+    "userId": "u_12",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_12_4",
+    "userId": "u_12",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_13_1",
+    "userId": "u_13",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_13_2",
+    "userId": "u_13",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_13_3",
+    "userId": "u_13",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_13_4",
+    "userId": "u_13",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_14_1",
+    "userId": "u_14",
+    "status": "reading",
+    "name": "reading",
+    "isDefault": true
+  },
+  {
+    "id": "sh_14_2",
+    "userId": "u_14",
+    "status": "read",
+    "name": "read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_14_3",
+    "userId": "u_14",
+    "status": "want_to_read",
+    "name": "want_to_read",
+    "isDefault": true
+  },
+  {
+    "id": "sh_14_4",
+    "userId": "u_14",
+    "status": "dnf",
+    "name": "dnf",
+    "isDefault": true
+  },
+  {
+    "id": "sh_1_c1",
+    "userId": "u_1",
+    "status": null,
+    "name": "Klassiklər",
+    "isDefault": false
+  },
+  {
+    "id": "sh_1_c2",
+    "userId": "u_1",
+    "status": null,
+    "name": "Yay oxunuşu",
+    "isDefault": false
+  }
+]

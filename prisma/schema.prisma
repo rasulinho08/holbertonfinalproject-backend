@@ -1,0 +1,960 @@
+// KitabDostu — database schema.
+//
+// A 1:1 mapping of backend-guide/DATABASE.md. Where Prisma cannot express
+// something (partial indexes, CHECK constraints, generated columns, the
+// citext/pg_trgm extensions), the SQL lives in a migration under
+// prisma/migrations/ and is noted here so the two do not drift.
+//
+// Field names are camelCase in Prisma and snake_case in Postgres via @map, so
+// the TypeScript reads naturally while the DDL matches the guide exactly.
+
+generator client {
+  provider = "prisma-client-js"
+  // Lets the datasource block declare the Postgres extensions the schema needs,
+  // so `prisma migrate` creates them instead of a hand-written migration.
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto, citext, unaccent, pg_trgm]
+}
+
+/* ================================== enums ================================= */
+
+enum UserRole {
+  user
+  publisher
+  admin
+
+  @@map("user_role")
+}
+
+enum BookLanguage {
+  az
+  en
+  tr
+  ru
+
+  @@map("book_language")
+}
+
+enum ShelfStatus {
+  reading
+  read
+  want_to_read
+  dnf
+
+  @@map("shelf_status")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  preparing
+  shipped
+  out_for_delivery
+  delivered
+  cancelled
+
+  @@map("order_status")
+}
+
+enum PaymentMethod {
+  card
+  cod
+  pos_on_delivery
+  wallet
+
+  @@map("payment_method")
+}
+
+enum DeliveryMethod {
+  courier
+  pickup
+  post
+
+  @@map("delivery_method")
+}
+
+enum PaymentStatus {
+  requires_confirmation
+  paid
+  failed
+  refunded
+
+  @@map("payment_status")
+}
+
+enum ReportReason {
+  spam
+  offensive
+  spoiler
+  copyright
+  other
+
+  @@map("report_reason")
+}
+
+enum ReportStatus {
+  open
+  kept
+  removed
+
+  @@map("report_status")
+}
+
+enum TargetType {
+  review
+  quote
+
+  @@map("target_type")
+}
+
+enum NotificationType {
+  follow
+  new_book
+  order_shipped
+  review_comment
+  quote_like
+  buddy_invite
+  goal_reached
+  badge_earned
+
+  @@map("notification_type")
+}
+
+/* ================================ identity ================================ */
+
+model User {
+  id       String  @id @default(uuid()) @db.Uuid
+  // citext, applied in the init migration — case-insensitive uniqueness without
+  // LOWER() at every call site.
+  username String  @unique
+  email    String  @unique
+  name     String
+  /// NULL for OAuth-only accounts.
+  passwordHash String? @map("password_hash")
+  avatarUrl    String? @map("avatar_url")
+  bio          String?
+
+  role        UserRole @default(user)
+  publisherId String?  @map("publisher_id") @db.Uuid
+
+  walletBalance Decimal @default(0) @map("wallet_balance") @db.Decimal(10, 2)
+
+  twoFactorSecret  String?  @map("two_factor_secret")
+  twoFactorEnabled Boolean  @default(false) @map("two_factor_enabled")
+
+  favoriteGenres String[] @default([]) @map("favorite_genres")
+  locale         String   @default("az")
+  /// IANA timezone; reading streaks and daily buckets are computed in it.
+  timezone       String   @default("Asia/Baku")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  publisher       Publisher? @relation(fields: [publisherId], references: [id], onDelete: SetNull)
+
+  favoriteAuthors UserFavoriteAuthor[]
+  refreshTokens   RefreshToken[]
+  passwordResets  PasswordResetToken[]
+  oauthAccounts   OAuthAccount[]
+  following       Follow[]             @relation("follower")
+  followers       Follow[]             @relation("followee")
+  authorFollows   AuthorFollow[]
+  shelves         Shelf[]
+  shelfEntries    ShelfEntry[]
+  readingSessions ReadingSession[]
+  readingGoals    ReadingGoal[]
+  reviews         Review[]
+  quotes          Quote[]
+  likes           Like[]
+  comments        Comment[]
+  ownedLists      BookList[]
+  listFollows     BookListFollow[]
+  ownedBuddyReads BuddyRead[]
+  buddyMemberships BuddyReadMember[]
+  buddyMessages   BuddyReadMessage[]
+  cartItems       CartItem[]
+  orders          Order[]
+  giftCards       GiftCard[]
+  walletTx        WalletTransaction[]
+  badges          UserBadge[]
+  notifications   Notification[]
+  deviceTokens    DeviceToken[]
+  reportsFiled    Report[]             @relation("reporter")
+  reportsResolved Report[]             @relation("resolver")
+  adminActions    AdminAction[]
+  orderEvents     OrderEvent[]
+  searchHistory   SearchHistory[]
+  publications    Publication[]
+
+  @@index([role])
+  @@map("users")
+}
+
+/// Onboarding quiz answers. A join table rather than an array so it can be
+/// joined against when building recommendations.
+model UserFavoriteAuthor {
+  userId   String @map("user_id") @db.Uuid
+  authorId String @map("author_id") @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  author Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@id([userId, authorId])
+  @@map("user_favorite_authors")
+}
+
+model RefreshToken {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  /// sha256 of the token. The token itself is never stored.
+  tokenHash String   @unique @map("token_hash")
+  /// Rotation lineage: reusing a revoked token revokes the whole family.
+  familyId  String   @map("family_id") @db.Uuid
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  userAgent String?  @map("user_agent")
+  ip        String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model OAuthAccount {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  provider    String
+  providerUid String   @map("provider_uid")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUid])
+  @@map("oauth_accounts")
+}
+
+model Follow {
+  followerId String   @map("follower_id") @db.Uuid
+  followeeId String   @map("followee_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  follower User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followee User @relation("followee", fields: [followeeId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followeeId])
+  @@index([followeeId])
+  @@map("follows")
+}
+
+/* =============================== catalogue ================================ */
+
+model Publisher {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  logoUrl   String?  @map("logo_url")
+  city      String   @default("Bakı")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  books  Book[]
+  orders Order[]
+  staff  User[]
+
+  @@map("publishers")
+}
+
+model Author {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  bio       String   @default("")
+  photoUrl  String?  @map("photo_url")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  books         Book[]
+  followers     AuthorFollow[]
+  favouritedBy  UserFavoriteAuthor[]
+
+  @@map("authors")
+}
+
+model AuthorFollow {
+  userId    String   @map("user_id") @db.Uuid
+  authorId  String   @map("author_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  author Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@id([userId, authorId])
+  @@map("author_follows")
+}
+
+model Book {
+  id          String       @id @default(uuid()) @db.Uuid
+  title       String
+  subtitle    String?
+  authorId    String       @map("author_id") @db.Uuid
+  publisherId String       @map("publisher_id") @db.Uuid
+  isbn        String?      @unique
+  language    BookLanguage @default(az)
+  /// Fixed vocabulary, but text[] rather than an enum so adding a genre is not
+  /// a migration. Validated in the application layer.
+  genres      String[]     @default([])
+  coverUrl    String?      @map("cover_url")
+  description String       @default("")
+  pageCount   Int          @map("page_count")
+  publishedYear Int?       @map("published_year")
+
+  price    Decimal  @db.Decimal(10, 2)
+  oldPrice Decimal? @map("old_price") @db.Decimal(10, 2)
+  stock    Int      @default(0)
+
+  /// Aggregates. Maintained on write, never computed on read. `ratingAverage`
+  /// is derived as ratingSum / ratingCount, so an update is one increment and
+  /// cannot drift.
+  ratingSum    Int @default(0) @map("rating_sum")
+  ratingCount  Int @default(0) @map("rating_count")
+  reviewsCount Int @default(0) @map("reviews_count")
+  quotesCount  Int @default(0) @map("quotes_count")
+
+  googleBooksId String? @unique @map("google_books_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  author    Author    @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  publisher Publisher @relation(fields: [publisherId], references: [id], onDelete: Restrict)
+
+  shelfEntries    ShelfEntry[]
+  readingSessions ReadingSession[]
+  reviews         Review[]
+  quotes          Quote[]
+  listItems       BookListItem[]
+  buddyReads      BuddyRead[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  publicationInclusions PublicationBook[]
+
+  @@index([authorId])
+  @@index([publisherId])
+  @@index([language])
+  @@index([price])
+  @@map("books")
+}
+
+/* ============================ shelves & reading =========================== */
+
+model Shelf {
+  id        String       @id @default(uuid()) @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  /// NULL for custom shelves; the four defaults map 1:1 onto ShelfStatus.
+  status    ShelfStatus?
+  name      String
+  isDefault Boolean      @default(false) @map("is_default")
+  position  Int          @default(0)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries ShelfEntry[]
+
+  @@index([userId])
+  @@map("shelves")
+}
+
+/// One row per (user, book) — a book lives on exactly one status shelf at a time.
+model ShelfEntry {
+  id           String      @id @default(uuid()) @db.Uuid
+  userId       String      @map("user_id") @db.Uuid
+  bookId       String      @map("book_id") @db.Uuid
+  shelfId      String      @map("shelf_id") @db.Uuid
+  status       ShelfStatus
+  progressPage Int         @default(0) @map("progress_page")
+  startedAt    DateTime?   @map("started_at") @db.Timestamptz(6)
+  finishedAt   DateTime?   @map("finished_at") @db.Timestamptz(6)
+  addedAt      DateTime    @default(now()) @map("added_at") @db.Timestamptz(6)
+  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  shelf Shelf @relation(fields: [shelfId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([shelfId, addedAt])
+  @@index([userId, status])
+  @@index([bookId])
+  @@map("shelf_entries")
+}
+
+/// One sitting with a book — not a daily aggregate.
+///
+/// The session timer lets a reader log two sittings with the same book on the
+/// same day, so there is deliberately no unique constraint on
+/// (user, book, date). The daily rollup the weekly chart needs is a GROUP BY
+/// on sessionDate rather than a table.
+model ReadingSession {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  bookId String @map("book_id") @db.Uuid
+
+  startPage Int @map("start_page")
+  endPage   Int @map("end_page")
+  /// 0 is legal — a session logged after the fact has no stopwatch reading, and
+  /// those rows are excluded from the speed estimate rather than rejected.
+  durationSeconds Int @default(0) @map("duration_seconds")
+  note            String?
+
+  startedAt DateTime @map("started_at") @db.Timestamptz(6)
+  endedAt   DateTime @map("ended_at") @db.Timestamptz(6)
+  /// Calendar day in the user's timezone, denormalised so "did they read
+  /// today?" and the streak are an index lookup rather than a per-row
+  /// timezone conversion across the table.
+  sessionDate DateTime @map("session_date") @db.Date
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sessionDate])
+  @@index([userId, bookId, startedAt])
+  @@map("reading_sessions")
+}
+
+model ReadingGoal {
+  userId    String   @map("user_id") @db.Uuid
+  year      Int
+  target    Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, year])
+  @@map("reading_goals")
+}
+
+/* ============================= social content ============================= */
+
+model Review {
+  id       String @id @default(uuid()) @db.Uuid
+  userId   String @map("user_id") @db.Uuid
+  bookId   String @map("book_id") @db.Uuid
+  rating   Int
+  body     String @default("")
+  isSpoiler Boolean @default(false) @map("is_spoiler")
+  photos   String[] @default([])
+
+  likesCount    Int @default(0) @map("likes_count")
+  commentsCount Int @default(0) @map("comments_count")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  /// One review per user per book.
+  @@unique([userId, bookId])
+  @@index([bookId, createdAt])
+  @@index([userId])
+  @@map("reviews")
+}
+
+model Quote {
+  id      String  @id @default(uuid()) @db.Uuid
+  userId  String  @map("user_id") @db.Uuid
+  bookId  String  @map("book_id") @db.Uuid
+  text    String
+  page    Int?
+  background String @default("paper")
+
+  likesCount    Int @default(0) @map("likes_count")
+  commentsCount Int @default(0) @map("comments_count")
+
+  /// Kept when the quote was captured with the OCR scanner.
+  sourceImageUrl String? @map("source_image_url")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([bookId, createdAt])
+  @@index([userId])
+  @@index([likesCount])
+  @@map("quotes")
+}
+
+/// One polymorphic table for reviews and quotes. `targetId` is deliberately not
+/// a foreign key — it points at two tables — so orphan rows are cleaned up when
+/// the parent is hard-deleted.
+model Like {
+  userId     String     @map("user_id") @db.Uuid
+  targetType TargetType @map("target_type")
+  targetId   String     @map("target_id") @db.Uuid
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, targetType, targetId])
+  @@index([targetType, targetId])
+  @@map("likes")
+}
+
+model Comment {
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  targetType TargetType @map("target_type")
+  targetId   String     @map("target_id") @db.Uuid
+  body       String
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt  DateTime?  @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([targetType, targetId, createdAt])
+  @@map("comments")
+}
+
+/* =============================== book lists =============================== */
+
+model BookList {
+  id          String  @id @default(uuid()) @db.Uuid
+  slug        String  @unique
+  title       String
+  description String  @default("")
+  ownerId     String  @map("owner_id") @db.Uuid
+  /// Staff-curated. Never settable from the create endpoint — the verified
+  /// badge in the UI keys on it.
+  isOfficial  Boolean @default(false) @map("is_official")
+  /// Counter cache: the browse query sorts on it, and counting the follow rows
+  /// per list would make that quadratic.
+  followersCount Int @default(0) @map("followers_count")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  owner     User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  items     BookListItem[]
+  followers BookListFollow[]
+
+  @@index([ownerId, createdAt])
+  @@index([isOfficial, followersCount])
+  @@map("book_lists")
+}
+
+model BookListItem {
+  listId String @map("list_id") @db.Uuid
+  bookId String @map("book_id") @db.Uuid
+  note   String?
+  /// Contiguous from 0. Removing an item re-packs the survivors; the client
+  /// renders by position and a gap reads as a numbering glitch.
+  position Int
+  addedAt  DateTime @default(now()) @map("added_at") @db.Timestamptz(6)
+
+  list BookList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  book Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  /// Composite key: this is what makes a duplicate add a 409 rather than a
+  /// silent second row.
+  @@id([listId, bookId])
+  @@index([listId, position])
+  @@index([bookId])
+  @@map("book_list_items")
+}
+
+model BookListFollow {
+  listId     String   @map("list_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  followedAt DateTime @default(now()) @map("followed_at") @db.Timestamptz(6)
+
+  list BookList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([listId, userId])
+  @@map("book_list_follows")
+}
+
+/* =============================== buddy reads ============================== */
+
+model BuddyRead {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  bookId     String    @map("book_id") @db.Uuid
+  ownerId    String    @map("owner_id") @db.Uuid
+  targetDate DateTime? @map("target_date") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  book     Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  owner    User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members  BuddyReadMember[]
+  messages BuddyReadMessage[]
+
+  @@map("buddy_reads")
+}
+
+model BuddyReadMember {
+  buddyReadId  String   @map("buddy_read_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  progressPage Int      @default(0) @map("progress_page")
+  joinedAt     DateTime @default(now()) @map("joined_at") @db.Timestamptz(6)
+
+  buddyRead BuddyRead @relation(fields: [buddyReadId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([buddyReadId, userId])
+  @@map("buddy_read_members")
+}
+
+model BuddyReadMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  buddyReadId String   @map("buddy_read_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  body        String
+  /// Optional anchor so discussion can be filtered by chapter.
+  chapter     Int?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  buddyRead BuddyRead @relation(fields: [buddyReadId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([buddyReadId, createdAt])
+  @@map("buddy_read_messages")
+}
+
+/* ================================ commerce ================================ */
+
+/// The cart lives server-side so it follows the reader across devices.
+model CartItem {
+  userId   String   @map("user_id") @db.Uuid
+  bookId   String   @map("book_id") @db.Uuid
+  quantity Int
+  addedAt  DateTime @default(now()) @map("added_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([userId, bookId])
+  @@map("cart_items")
+}
+
+/// One order per publisher. A cart spanning three publishers produces three
+/// rows here, each with its own delivery fee and status timeline.
+model Order {
+  id          String @id @default(uuid()) @db.Uuid
+  /// Short human reference shown in the app and quoted to support.
+  code        String @unique
+  userId      String @map("user_id") @db.Uuid
+  publisherId String @map("publisher_id") @db.Uuid
+
+  subtotal    Decimal @db.Decimal(10, 2)
+  deliveryFee Decimal @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  discount    Decimal @default(0) @db.Decimal(10, 2)
+  total       Decimal @db.Decimal(10, 2)
+
+  status         OrderStatus    @default(pending)
+  paymentMethod  PaymentMethod  @map("payment_method")
+  deliveryMethod DeliveryMethod @map("delivery_method")
+
+  /// The address is copied in, not referenced — an order must show the address
+  /// it was delivered to even after the reader edits their saved one.
+  addressFullName String  @map("address_full_name")
+  addressPhone    String  @map("address_phone")
+  addressCity     String  @map("address_city")
+  addressLine     String  @default("") @map("address_line")
+  addressNote     String? @map("address_note")
+
+  giftCardId        String?   @map("gift_card_id") @db.Uuid
+  estimatedDelivery DateTime? @map("estimated_delivery") @db.Timestamptz(6)
+  /// Set from the Idempotency-Key header so a retried checkout returns the
+  /// original order instead of creating a duplicate.
+  idempotencyKey    String?   @unique @map("idempotency_key")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  publisher Publisher @relation(fields: [publisherId], references: [id], onDelete: Restrict)
+  giftCard  GiftCard? @relation(fields: [giftCardId], references: [id], onDelete: SetNull)
+
+  items    OrderItem[]
+  events   OrderEvent[]
+  payments Payment[]
+  walletTx WalletTransaction[]
+
+  @@index([userId, createdAt])
+  @@index([publisherId, createdAt])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id      String  @id @default(uuid()) @db.Uuid
+  orderId String  @map("order_id") @db.Uuid
+  bookId  String? @map("book_id") @db.Uuid
+
+  /// Denormalised so removing a book does not erase order history.
+  title      String
+  authorName String  @map("author_name")
+  coverUrl   String? @map("cover_url")
+  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
+  quantity   Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book  Book? @relation(fields: [bookId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+/// The tracking timeline the app renders on the order screen.
+model OrderEvent {
+  id        String      @id @default(uuid()) @db.Uuid
+  orderId   String      @map("order_id") @db.Uuid
+  status    OrderStatus
+  note      String?
+  actorId   String?     @map("actor_id") @db.Uuid
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@map("order_events")
+}
+
+model Payment {
+  id        String        @id @default(uuid()) @db.Uuid
+  orderId   String        @map("order_id") @db.Uuid
+  provider  String        @default("payriff")
+  reference String        @unique
+  amount    Decimal       @db.Decimal(10, 2)
+  status    PaymentStatus @default(requires_confirmation)
+  /// The provider's raw payload. Reconciliation disputes are much easier with
+  /// it than without.
+  rawResponse Json? @map("raw_response")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model GiftCard {
+  id        String    @id @default(uuid()) @db.Uuid
+  code      String    @unique
+  amount    Decimal   @db.Decimal(10, 2)
+  usedById  String?   @map("used_by") @db.Uuid
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  expiresAt DateTime? @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  usedBy User?   @relation(fields: [usedById], references: [id], onDelete: SetNull)
+  orders Order[]
+
+  @@map("gift_cards")
+}
+
+/// `users.walletBalance` must always equal SUM(amount) here. Never write the
+/// balance without writing a row.
+model WalletTransaction {
+  id      String  @id @default(uuid()) @db.Uuid
+  userId  String  @map("user_id") @db.Uuid
+  /// Negative for a debit.
+  amount  Decimal @db.Decimal(10, 2)
+  /// order_payment | refund | gift_card | adjustment
+  reason  String
+  orderId String? @map("order_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("wallet_transactions")
+}
+
+/* ====================== gamification & notifications ====================== */
+
+model Badge {
+  id            String @id @default(uuid()) @db.Uuid
+  slug          String @unique
+  nameAz        String @map("name_az")
+  nameEn        String @map("name_en")
+  descriptionAz String @map("description_az")
+  descriptionEn String @map("description_en")
+  icon          String
+  target        Int
+
+  earnedBy UserBadge[]
+
+  @@map("badges")
+}
+
+/// Only the earned moment is persisted; progress towards a badge is computed
+/// on read from the underlying counts.
+model UserBadge {
+  userId   String   @map("user_id") @db.Uuid
+  badgeId  String   @map("badge_id") @db.Uuid
+  earnedAt DateTime @default(now()) @map("earned_at") @db.Timestamptz(6)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, badgeId])
+  @@map("user_badges")
+}
+
+model Notification {
+  id     String           @id @default(uuid()) @db.Uuid
+  userId String           @map("user_id") @db.Uuid
+  type   NotificationType
+  /// Values interpolated into the localized string on the client, so the
+  /// server never stores rendered Azerbaijani.
+  params Json             @default("{}")
+  actorId String?         @map("actor_id") @db.Uuid
+  read    Boolean         @default(false)
+  /// In-app route to open on tap, e.g. `/book/<id>`.
+  link    String?
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+model DeviceToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique
+  platform  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+/* =============================== moderation =============================== */
+
+model Report {
+  id         String       @id @default(uuid()) @db.Uuid
+  targetType TargetType   @map("target_type")
+  targetId   String       @map("target_id") @db.Uuid
+  reason     ReportReason
+  note       String?
+  reporterId String       @map("reporter_id") @db.Uuid
+  status     ReportStatus @default(open)
+
+  /// Snapshot of the content at report time, so a moderator still sees what was
+  /// reported after it has been removed.
+  snapshotText       String  @map("snapshot_text")
+  snapshotAuthorName String  @map("snapshot_author_name")
+  snapshotBookTitle  String? @map("snapshot_book_title")
+
+  resolvedById String?   @map("resolved_by") @db.Uuid
+  resolvedAt   DateTime? @map("resolved_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  reporter   User  @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  resolvedBy User? @relation("resolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+  @@map("reports")
+}
+
+model AdminAction {
+  id         String   @id @default(uuid()) @db.Uuid
+  adminId    String   @map("admin_id") @db.Uuid
+  action     String
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  note       String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+  @@map("admin_actions")
+}
+
+model SearchHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  term      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("search_history")
+}
+
+/* =============================== publications ============================== */
+
+model Publication {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String
+  content   String   @db.Text
+  coverUrl  String?  @map("cover_url")
+  authorId  String   @map("author_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  author        User              @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  recommendedBooks PublicationBook[]
+
+  @@index([createdAt])
+  @@index([authorId])
+  @@map("publications")
+}
+
+model PublicationBook {
+  publicationId String @map("publication_id") @db.Uuid
+  bookId        String @map("book_id") @db.Uuid
+  note          String?
+  position      Int    @default(0)
+  addedAt       DateTime @default(now()) @map("added_at") @db.Timestamptz(6)
+
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  book        Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([publicationId, bookId])
+  @@index([publicationId, position])
+  @@index([bookId])
+  @@map("publication_books")
+}
+

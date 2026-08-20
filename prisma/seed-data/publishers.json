@@ -1,0 +1,72 @@
+[
+  {
+    "id": "pub_1",
+    "name": "Qanun Nəşriyyatı",
+    "slug": "qanun-nəşriyyatı",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_2",
+    "name": "TEAS Press",
+    "slug": "teas-press",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_3",
+    "name": "Alatoran Yayınları",
+    "slug": "alatoran-yayınları",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_4",
+    "name": "Parlaq İmzalar",
+    "slug": "parlaq-i-mzalar",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_5",
+    "name": "Hədəf Nəşrləri",
+    "slug": "hədəf-nəşrləri",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_6",
+    "name": "Şərq-Qərb",
+    "slug": "şərq-qərb",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_7",
+    "name": "Altun Kitab",
+    "slug": "altun-kitab",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_8",
+    "name": "Libraff Nəşriyyat",
+    "slug": "libraff-nəşriyyat",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_9",
+    "name": "Teas Press Uşaq",
+    "slug": "teas-press-uşaq",
+    "logoUrl": null,
+    "city": "Bakı"
+  },
+  {
+    "id": "pub_10",
+    "name": "Elm və Təhsil",
+    "slug": "elm-və-təhsil",
+    "logoUrl": null,
+    "city": "Bakı"
+  }
+]
