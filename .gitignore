@@ -1,30 +1,57 @@
-# dependencies
+# Dependencies
 node_modules/
 
-# build output
+# Build
 dist/
+.expo/
+# DO NOT COMMIT: simulated home dir — may contain browser profile, cookies, passwords
+.expo-home/
 
-# environment — never commit real secrets
+# Environment
 .env
 .env.local
 .env.*.local
 
-# logs
+# Logs
 *.log
 npm-debug.*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.*
+lerna-debug.log*
 
-# test output
+# Tests
 coverage/
 
-# prisma
+# Local databases
+*.db
+*.db-journal
 prisma/*.db
 prisma/*.db-journal
 
-# editors
+# IDE / AI tools
 .idea/
 .vscode/*
-!.vscode/extensions.json
+.claude/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Certificates / signing keys (never commit)
+*.pem
+*.pfx
+*.crt
+*.cert
+*.keystore
+
+# Backups
+*.bak
+*.backup
+*.orig
 
 # OS
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

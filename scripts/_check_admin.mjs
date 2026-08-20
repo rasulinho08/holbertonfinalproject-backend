@@ -1,6 +1,11 @@
 import { execFileSync } from 'node:child_process';
-const PSQL = 'C:\\Program Files\\PostgreSQL\\18\\bin\\psql.exe';
-const env = { ...process.env, PGPASSWORD: 'kitabdostu' };
+const PSQL = process.env.PSQL_PATH || 'C:\\Program Files\\PostgreSQL\\18\\bin\\psql.exe';
+const PGHOST = process.env.PGHOST || 'localhost';
+const PGPORT = process.env.PGPORT || '5432';
+const APP_PGUSER = process.env.APP_PGUSER || 'kitabdostu';
+const APP_PGPASSWORD = process.env.APP_PGPASSWORD || '';
+const PGDATABASE = process.env.PGDATABASE || 'kitabdostu';
+const env = { ...process.env, PGPASSWORD: APP_PGPASSWORD };
 
 const sql = `
   SELECT id, email, username, name, role::text AS role,
@@ -11,7 +16,7 @@ const sql = `
 
 const out = execFileSync(
   PSQL,
-  ['-h', 'localhost', '-p', '5432', '-U', 'kitabdostu', '-d', 'kitabdostu',
+  ['-h', PGHOST, '-p', PGPORT, '-U', APP_PGUSER, '-d', PGDATABASE,
    '-v', 'ON_ERROR_STOP=1', '-X', '-F', '|', '-R', '\n',
    '-P', 'footer=off', '-P', 'tuples_only=off', '-P', 'format=unaligned',
    '-c', sql],

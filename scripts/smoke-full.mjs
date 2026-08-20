@@ -14,7 +14,11 @@
  */
 
 const BASE = process.env.API_BASE ?? 'http://localhost:4000/api/v1';
-const PASSWORD = 'password123';
+const PASSWORD = process.env.SMOKE_PASSWORD ?? process.env.TEST_PASSWORD ?? '';
+if (!PASSWORD) {
+  console.error('[fail] SMOKE_PASSWORD or TEST_PASSWORD must be set in the environment.');
+  process.exit(2);
+}
 
 let token = null;
 let pass = 0;
