@@ -24,6 +24,7 @@ import {
 import { buddyRouter } from './buddy/routes.js';
 import { publisherRouter } from './publisher/routes.js';
 import { adminRouter, reportsRouter } from './admin/routes.js';
+import { postsRouter } from './posts/routes.js';
 import { ocrRouter, uploadsRouter } from './media/routes.js';
 
 /**
@@ -93,6 +94,9 @@ apiRouter.use('/buddy-reads', buddyRouter);
 apiRouter.use('/publisher', publisherRouter);
 apiRouter.use('/reports', reportsRouter);
 apiRouter.use('/admin', adminRouter);
+
+// Public reads only. Writes live under /admin/posts (see modules/admin/routes.ts).
+apiRouter.use('/posts', postsRouter);
 
 apiRouter.use('/uploads', uploadsRouter);
 apiRouter.use('/ocr', ocrRouter);
