@@ -1,5 +1,11 @@
 # Local PostgreSQL for development.
 #
+# Copy .env.example to .env (or set these in your shell) BEFORE running compose
+# so the container is created with the right credentials. Required variables:
+#   POSTGRES_USER      — unprivileged DB user the app connects as
+#   POSTGRES_PASSWORD  — password for that user
+#   POSTGRES_DB        — database name created on first boot
+#
 #   docker compose up -d      # start
 #   docker compose down       # stop, keep data
 #   docker compose down -v    # stop and wipe the volume
@@ -13,18 +19,21 @@
 # the way to avoid that. If it is taken on your machine, change both this
 # mapping and DATABASE_URL in .env.
 
+x-pg-env: &pg-env
+  POSTGRES_USER: ${POSTGRES_USER:-kitabdostu}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env or the shell}
+  POSTGRES_DB: ${POSTGRES_DB:-kitabdostu}
+  # Azerbaijani sorting; the catalogue is mostly Latin-script but the
+  # collation matters for ə, ı, ö, ü, ç, ş, ğ in ORDER BY.
+  LANG: en_US.utf8
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: kitabdostu-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: kitabdostu
-      POSTGRES_PASSWORD: kitabdostu
-      POSTGRES_DB: kitabdostu
-      # Azerbaijani sorting; the catalogue is mostly Latin-script but the
-      # collation matters for ə, ı, ö, ü, ç, ş, ğ in ORDER BY.
-      LANG: en_US.utf8
+      <<: *pg-env
     ports:
       - '5544:5432'
     volumes:
@@ -33,7 +42,7 @@ services:
       # Migrations run immediately after `up`, so the compose file has to know
       # when the server is genuinely accepting connections — the container being
       # "running" is not the same thing.
-      test: ['CMD-SHELL', 'pg_isready -U kitabdostu -d kitabdostu']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-kitabdostu} -d ${POSTGRES_DB:-kitabdostu}']
       interval: 5s
       timeout: 5s
       retries: 10
