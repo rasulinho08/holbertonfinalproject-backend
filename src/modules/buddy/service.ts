@@ -1,7 +1,10 @@
 import { prisma } from '../../lib/prisma.js';
 import { conflict, forbidden, notFound } from '../../lib/errors.js';
+import { localDateColumn } from '../../lib/dates.js';
 import { serializeUserSummary, userSummarySelect, type UserSummary } from '../users/service.js';
 import { notify } from '../notifications/service.js';
+import { checkGoalReached, defaultShelvesByStatus } from '../shelves/service.js';
+import { evaluateBadges } from '../gamification/badges.js';
 
 /**
  * Buddy reads — a group reading the same book together.
@@ -179,16 +182,90 @@ export async function updateBuddyProgress(
 ): Promise<SerializedBuddyRead> {
   const membership = await prisma.buddyReadMember.findUnique({
     where: { buddyReadId_userId: { buddyReadId: id, userId } },
-    include: { buddyRead: { include: { book: { select: { pageCount: true } } } } },
+    include: { buddyRead: { include: { book: { select: { id: true, pageCount: true } } } } },
   });
   if (!membership) throw forbidden('You are not a member of this buddy read');
 
+  const book = membership.buddyRead.book;
+  const targetPage = Math.max(0, Math.min(book.pageCount, Math.floor(page)));
+
   await prisma.buddyReadMember.update({
     where: { buddyReadId_userId: { buddyReadId: id, userId } },
-    data: {
-      progressPage: Math.max(0, Math.min(membership.buddyRead.book.pageCount, Math.floor(page))),
-    },
+    data: { progressPage: targetPage },
   });
+
+  // Mirrors the group's page onto the reader's own shelf entry, the same way
+  // `updateProgress` in shelves/service.ts does for a solo read. Without this,
+  // a buddy read was a second, disconnected progress tracker: finishing a book
+  // here never touched `ShelfEntry`, so it never counted toward "books read",
+  // the annual goal ring, or badges — all of which read `ShelfEntry`, not
+  // `BuddyReadMember`. A reader who does all their reading through a group
+  // would show 0 read books forever.
+  const defaults = await defaultShelvesByStatus(userId);
+  const entry = await prisma.shelfEntry.findUnique({
+    where: { userId_bookId: { userId, bookId: book.id } },
+  });
+
+  // No entry yet: the reader joined the group without shelving the book
+  // themselves. They are demonstrably reading it, so "reading" is the shelf a
+  // fresh entry belongs on — the same default a first page turn would pick.
+  const previousPage = entry?.progressPage ?? 0;
+  const pagesAdvanced = targetPage - previousPage;
+
+  let status = entry?.status ?? 'reading';
+  let shelfId = entry?.shelfId ?? defaults.reading.id;
+  let finishedAt = entry?.finishedAt ?? null;
+  let startedAt = entry?.startedAt ?? null;
+
+  if (targetPage >= book.pageCount) {
+    status = 'read';
+    finishedAt = entry?.finishedAt ?? new Date();
+    if (!entry || entry.status !== 'read') shelfId = defaults.read.id;
+  } else if (targetPage > 0 && status !== 'reading') {
+    status = 'reading';
+    finishedAt = null;
+    startedAt = entry?.startedAt ?? new Date();
+    if (!entry || entry.status === 'want_to_read') shelfId = defaults.reading.id;
+  }
+  if (targetPage > 0 && !startedAt) startedAt = new Date();
+
+  await prisma.$transaction(async (tx) => {
+    await tx.shelfEntry.upsert({
+      where: { userId_bookId: { userId, bookId: book.id } },
+      create: {
+        userId,
+        bookId: book.id,
+        shelfId,
+        status,
+        progressPage: targetPage,
+        startedAt,
+        finishedAt,
+      },
+      update: { shelfId, status, progressPage: targetPage, startedAt, finishedAt },
+    });
+
+    // Same signal a manual progress update or a logged session leaves: an
+    // entry in `ReadingSession` so the streak and the reading-marathon badge
+    // see pages turned via a buddy read exactly like pages turned any other way.
+    if (pagesAdvanced > 0) {
+      const now = new Date();
+      await tx.readingSession.create({
+        data: {
+          userId,
+          bookId: book.id,
+          startPage: previousPage,
+          endPage: targetPage,
+          durationSeconds: 0,
+          startedAt: now,
+          endedAt: now,
+          sessionDate: localDateColumn(now),
+        },
+      });
+    }
+  });
+
+  if (status === 'read') await checkGoalReached(userId);
+  void evaluateBadges(userId).catch(() => undefined);
 
   return getBuddyRead(id);
 }

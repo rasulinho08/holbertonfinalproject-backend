@@ -6,6 +6,7 @@ import { requireAuth, requireRole, userId } from '../../middleware/auth.js';
 import { buildMeta, created, noContent, ok, page } from '../../lib/envelope.js';
 import { pagination, queryString } from '../../lib/pagination.js';
 import { deleteQuote, deleteReview } from '../social/service.js';
+import { adminPostsRouter } from '../posts/routes.js';
 import * as service from './service.js';
 import type { ReportStatus } from '@prisma/client';
 
@@ -127,3 +128,5 @@ adminRouter.delete(
     noContent(res);
   }),
 );
+
+adminRouter.use('/posts', adminPostsRouter);
