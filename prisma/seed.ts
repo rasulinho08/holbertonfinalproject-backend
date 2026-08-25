@@ -30,8 +30,26 @@ import type {
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DATA = resolve(HERE, 'seed-data');
 
-/** Every seeded user gets this password. Development only. */
-const DEV_PASSWORD = 'password123';
+/**
+ * Every seeded user gets this password. Development only.
+ *
+ * MUST be provided via the SEED_PASSWORD environment variable so nothing that
+ * looks like a credential ever lives in source. If unset, seed fails loudly
+ * with setup instructions — deliberately.
+ */
+const DEV_PASSWORD: string = (() => {
+  const v = process.env.SEED_PASSWORD;
+  if (!v) {
+    console.error(
+      '[seed] SEED_PASSWORD is not set.\n' +
+        '  PowerShell:  $env:SEED_PASSWORD = "your-dev-password"\n' +
+        '  Bash:        export SEED_PASSWORD="your-dev-password"\n' +
+        'Then re-run:  npm run seed',
+    );
+    process.exit(1);
+  }
+  return v;
+})();
 
 const prisma = new PrismaClient();
 

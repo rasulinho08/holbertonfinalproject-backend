@@ -1,5 +1,7 @@
-$BASE = 'http://localhost:4000/api/v1'
-$body = @{email='admin@kitabdostu.az';password='password123'} | ConvertTo-Json
+$BASE = if ($env:API_BASE) { $env:API_BASE } else { 'http://localhost:4000/api/v1' }
+$ADMIN_EMAIL = if ($env:ADMIN_EMAIL) { $env:ADMIN_EMAIL } else { 'admin@kitabdostu.az' }
+$ADMIN_PASSWORD = if ($env:ADMIN_PASSWORD) { $env:ADMIN_PASSWORD } else { $(throw 'ADMIN_PASSWORD environment variable must be set') }
+$body = @{email=$ADMIN_EMAIL;password=$ADMIN_PASSWORD} | ConvertTo-Json
 $adminToken = (Invoke-RestMethod -UseBasicParsing -Uri "$BASE/auth/login" -Method Post -Body $body -Headers @{'Content-Type'='application/json'}).data.accessToken
 
 $book = (Invoke-RestMethod -UseBasicParsing "$BASE/books?limit=1").data[0]
