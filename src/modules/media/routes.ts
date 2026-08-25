@@ -22,7 +22,7 @@ uploadsRouter.post(
       // handled here: presigned direct-to-storage uploads are the production
       // path, and this endpoint is the fallback that records the result.
       uri: z.string().min(1, 'uri is required').max(2000),
-      kind: z.enum(['avatar', 'cover', 'review', 'quote']).default('review'),
+      kind: z.enum(['avatar', 'cover', 'review', 'quote', 'publication']).default('review'),
     }),
   ),
   asyncHandler(async (req, res) => {

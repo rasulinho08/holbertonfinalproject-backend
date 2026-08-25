@@ -190,6 +190,7 @@ model User {
   adminActions    AdminAction[]
   orderEvents     OrderEvent[]
   searchHistory   SearchHistory[]
+  publications    Publication[]
 
   @@index([role])
   @@map("users")
@@ -356,6 +357,7 @@ model Book {
   buddyReads      BuddyRead[]
   cartItems       CartItem[]
   orderItems      OrderItem[]
+  publicationInclusions PublicationBook[]
 
   @@index([authorId])
   @@index([publisherId])
@@ -920,3 +922,39 @@ model SearchHistory {
   @@index([userId, createdAt])
   @@map("search_history")
 }
+
+/* =============================== publications ============================== */
+
+model Publication {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String
+  content   String   @db.Text
+  coverUrl  String?  @map("cover_url")
+  authorId  String   @map("author_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  author        User              @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  recommendedBooks PublicationBook[]
+
+  @@index([createdAt])
+  @@index([authorId])
+  @@map("publications")
+}
+
+model PublicationBook {
+  publicationId String @map("publication_id") @db.Uuid
+  bookId        String @map("book_id") @db.Uuid
+  note          String?
+  position      Int    @default(0)
+  addedAt       DateTime @default(now()) @map("added_at") @db.Timestamptz(6)
+
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  book        Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([publicationId, bookId])
+  @@index([publicationId, position])
+  @@index([bookId])
+  @@map("publication_books")
+}
+
