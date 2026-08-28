@@ -1,4 +1,4 @@
-import type { Book, BookLanguage, Prisma } from '@prisma/client';
+import { Prisma, type Book, type BookLanguage } from '@prisma/client';
 import { prisma, money, moneyOrNull } from '../../lib/prisma.js';
 import { notFound } from '../../lib/errors.js';
 
@@ -403,6 +403,132 @@ export async function recommendations(
   `;
 
   return hydrate(scored.map((r) => r.id), userId);
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * One book drawn at random from the caller's onboarding preferences.
+ *
+ * Reuses the same preference sources as `recommendations` (`users.favorite_genres`
+ * and `user_favorite_authors`) but does not rank: each press should be able to
+ * land on a different matching title. Already-read and currently-reading shelf
+ * entries are skipped; `want_to_read` and `dnf` stay in the pool.
+ *
+ * Fallback (first non-empty pool wins):
+ *   1. preferred genres AND preferred authors
+ *   2. preferred genres
+ *   3. preferred authors
+ *   4. catalogue minus read/reading
+ *   5. catalogue minus read
+ *   6. any live catalogue row
+ */
+export async function randomRecommendation(
+  userId: string,
+  excludeBookId?: string,
+): Promise<SerializedBook> {
+  const exclude = excludeBookId && UUID_RE.test(excludeBookId) ? excludeBookId : undefined;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { favoriteGenres: true },
+  });
+  const favoriteAuthors = await prisma.userFavoriteAuthor.findMany({
+    where: { userId },
+    select: { authorId: true },
+  });
+
+  const genres = user?.favoriteGenres ?? [];
+  const authorIds = favoriteAuthors.map((f) => f.authorId);
+
+  const id =
+    (await pickFromPreferencePool(userId, genres, authorIds, exclude)) ??
+    (exclude ? await pickFromPreferencePool(userId, genres, authorIds, undefined) : null);
+
+  if (!id) throw notFound('Book');
+
+  const [book] = await hydrate([id], userId);
+  if (!book) throw notFound('Book');
+  return book;
+}
+
+async function pickFromPreferencePool(
+  userId: string,
+  genres: string[],
+  authorIds: string[],
+  excludeBookId: string | undefined,
+): Promise<string | null> {
+  const attempts: Array<{ genres?: string[]; authors?: string[]; statuses: string[] }> = [];
+
+  if (genres.length > 0 && authorIds.length > 0) {
+    attempts.push({ genres, authors: authorIds, statuses: ['read', 'reading'] });
+  }
+  if (genres.length > 0) {
+    attempts.push({ genres, statuses: ['read', 'reading'] });
+  }
+  if (authorIds.length > 0) {
+    attempts.push({ authors: authorIds, statuses: ['read', 'reading'] });
+  }
+  attempts.push({ statuses: ['read', 'reading'] });
+  attempts.push({ statuses: ['read'] });
+  attempts.push({ statuses: [] });
+
+  for (const attempt of attempts) {
+    const id = await pickRandomBookId(userId, {
+      genres: attempt.genres,
+      authorIds: attempt.authors,
+      excludeBookId,
+      excludeStatuses: attempt.statuses,
+    });
+    if (id) return id;
+  }
+  return null;
+}
+
+async function pickRandomBookId(
+  userId: string,
+  opts: {
+    genres?: string[];
+    authorIds?: string[];
+    excludeBookId?: string | undefined;
+    excludeStatuses: string[];
+  },
+): Promise<string | null> {
+  const genreFilter =
+    opts.genres && opts.genres.length > 0
+      ? Prisma.sql`AND b.genres && ${opts.genres}::text[]`
+      : Prisma.sql``;
+  const authorFilter =
+    opts.authorIds && opts.authorIds.length > 0
+      ? Prisma.sql`AND b.author_id = ANY(${opts.authorIds}::uuid[])`
+      : Prisma.sql``;
+  const excludeBook =
+    opts.excludeBookId
+      ? Prisma.sql`AND b.id <> ${opts.excludeBookId}::uuid`
+      : Prisma.sql``;
+  const shelfFilter =
+    opts.excludeStatuses.length > 0
+      ? Prisma.sql`AND NOT EXISTS (
+          SELECT 1 FROM shelf_entries se
+          WHERE se.book_id = b.id
+            AND se.user_id = ${userId}::uuid
+            AND se.status::text = ANY(${opts.excludeStatuses}::text[])
+        )`
+      : Prisma.sql``;
+
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT b.id
+    FROM books b
+    WHERE b.deleted_at IS NULL
+      ${genreFilter}
+      ${authorFilter}
+      ${excludeBook}
+      ${shelfFilter}
+    ORDER BY RANDOM()
+    LIMIT 1
+  `;
+  return rows[0]?.id ?? null;
 }
 
 /** Loads books by id and restores the ranked order the SQL produced. */
