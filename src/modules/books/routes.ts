@@ -53,6 +53,14 @@ booksRouter.get(
 );
 
 booksRouter.get(
+  '/random-recommendation',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    ok(res, await service.randomRecommendation(userId(req), queryString(req.query.exclude)));
+  }),
+);
+
+booksRouter.get(
   '/',
   optionalAuth,
   asyncHandler(async (req, res) => {
