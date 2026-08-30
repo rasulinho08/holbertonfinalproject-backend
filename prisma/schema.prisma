@@ -138,6 +138,7 @@ model User {
   passwordHash String? @map("password_hash")
   avatarUrl    String? @map("avatar_url")
   bio          String?
+  website      String?
 
   role        UserRole @default(user)
   publisherId String?  @map("publisher_id") @db.Uuid
