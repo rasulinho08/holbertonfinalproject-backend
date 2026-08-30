@@ -21,6 +21,7 @@ const updateProfileSchema = z.object({
   username: usernameSchema.optional(),
   bio: z.string().trim().max(300).nullable().optional(),
   avatarUrl: z.string().url().nullable().optional(),
+  website: z.string().trim().url().max(500).nullable().optional(),
 });
 
 const goalSchema = z.object({
@@ -56,6 +57,7 @@ usersRouter.patch(
         ...(req.body.username !== undefined && { username: req.body.username }),
         ...(req.body.bio !== undefined && { bio: req.body.bio }),
         ...(req.body.avatarUrl !== undefined && { avatarUrl: req.body.avatarUrl }),
+        ...(req.body.website !== undefined && { website: req.body.website }),
       },
     });
 
@@ -82,6 +84,7 @@ usersRouter.delete(
         passwordHash: null,
         avatarUrl: null,
         bio: null,
+        website: null,
         twoFactorEnabled: false,
         twoFactorSecret: null,
       },
