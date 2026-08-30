@@ -101,6 +101,7 @@ export interface SerializedUser {
   email: string;
   avatarUrl: string | null;
   bio: string | null;
+  website: string | null;
   role: string;
   createdAt: string;
   followersCount: number;
@@ -161,6 +162,7 @@ export async function serializeUser(user: User, viewerId?: string | null): Promi
     email: isSelf ? user.email : '',
     avatarUrl: user.avatarUrl,
     bio: user.bio,
+    website: user.website,
     role: user.role,
     createdAt: user.createdAt.toISOString(),
     followersCount,
