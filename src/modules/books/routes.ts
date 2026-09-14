@@ -61,6 +61,24 @@ booksRouter.get(
 );
 
 booksRouter.get(
+  '/most-read',
+  optionalAuth,
+  asyncHandler(async (req, res) => {
+    const limit = Math.min(50, queryNumber(req.query.limit) ?? 10);
+    ok(res, await service.mostReadBooks(limit, optionalUserId(req)));
+  }),
+);
+
+booksRouter.get(
+  '/best-selling',
+  optionalAuth,
+  asyncHandler(async (req, res) => {
+    const limit = Math.min(50, queryNumber(req.query.limit) ?? 10);
+    ok(res, await service.bestSellingBooks(limit, optionalUserId(req)));
+  }),
+);
+
+booksRouter.get(
   '/',
   optionalAuth,
   asyncHandler(async (req, res) => {

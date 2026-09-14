@@ -567,6 +567,61 @@ export async function newReleases(limit: number, viewerId: string | null): Promi
   return withShelfState(rows, viewerId);
 }
 
+export interface SerializedBookWithReaders extends SerializedBook {
+  readers: number;
+}
+
+/**
+ * Books ranked by distinct readers who have the book on the reading or read
+ * shelf. This is the true "most read" metric, unlike trending which measures
+ * engagement (reviews, quotes, ratings).
+ */
+export async function mostReadBooks(
+  limit: number,
+  viewerId: string | null,
+): Promise<SerializedBookWithReaders[]> {
+  const rows = await prisma.$queryRaw<{ bookId: string; readers: number }[]>`
+    SELECT se.book_id AS "bookId", COUNT(DISTINCT se.user_id)::int AS readers
+    FROM shelf_entries se
+    JOIN books b ON b.id = se.book_id AND b.deleted_at IS NULL
+    WHERE se.status IN ('reading', 'read')
+    GROUP BY se.book_id
+    ORDER BY readers DESC, MAX(se.updated_at) DESC
+    LIMIT ${limit}
+  `;
+
+  const ids = rows.map((r) => r.bookId);
+  const books = await hydrate(ids, viewerId);
+  const readersByBook = new Map(rows.map((r) => [r.bookId, r.readers]));
+  return books.map((b) => ({ ...b, readers: readersByBook.get(b.id) ?? 0 }));
+}
+
+export interface SerializedBookWithSales extends SerializedBook {
+  units: number;
+}
+
+/** Books ranked by quantity sold across all non-cancelled orders. */
+export async function bestSellingBooks(
+  limit: number,
+  viewerId: string | null,
+): Promise<SerializedBookWithSales[]> {
+  const rows = await prisma.$queryRaw<{ bookId: string; units: number }[]>`
+    SELECT oi.book_id AS "bookId", SUM(oi.quantity)::int AS units
+    FROM order_items oi
+    JOIN orders o ON o.id = oi.order_id
+    JOIN books b ON b.id = oi.book_id AND b.deleted_at IS NULL
+    WHERE o.status <> 'cancelled' AND oi.book_id IS NOT NULL
+    GROUP BY oi.book_id
+    ORDER BY units DESC, MAX(o.created_at) DESC
+    LIMIT ${limit}
+  `;
+
+  const ids = rows.map((r) => r.bookId);
+  const books = await hydrate(ids, viewerId);
+  const unitsByBook = new Map(rows.map((r) => [r.bookId, r.units]));
+  return books.map((b) => ({ ...b, units: unitsByBook.get(b.id) ?? 0 }));
+}
+
 /* --------------------------------- genres --------------------------------- */
 
 export async function genreCounts(): Promise<{ slug: string; bookCount: number }[]> {

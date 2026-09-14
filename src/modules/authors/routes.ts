@@ -2,10 +2,19 @@ import { Router } from 'express';
 import { asyncHandler } from '../../middleware/error.js';
 import { optionalAuth, optionalUserId, requireAuth, userId } from '../../middleware/auth.js';
 import { buildMeta, ok, page } from '../../lib/envelope.js';
-import { pagination } from '../../lib/pagination.js';
+import { pagination, queryNumber } from '../../lib/pagination.js';
 import * as service from './service.js';
 
 export const authorsRouter: Router = Router();
+
+authorsRouter.get(
+  '/most-read',
+  optionalAuth,
+  asyncHandler(async (req, res) => {
+    const limit = Math.min(50, queryNumber(req.query.limit) ?? 10);
+    ok(res, await service.mostReadAuthors(limit, optionalUserId(req)));
+  }),
+);
 
 authorsRouter.get(
   '/:id',
