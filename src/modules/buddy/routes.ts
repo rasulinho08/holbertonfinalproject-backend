@@ -24,6 +24,10 @@ const messageSchema = z.object({
   chapter: z.coerce.number().int().positive().nullable().optional(),
 });
 
+const inviteSchema = z.object({
+  inviteeId: z.string().uuid('inviteeId must be a valid id'),
+});
+
 buddyRouter.get(
   '/',
   requireAuth,
@@ -47,7 +51,7 @@ buddyRouter.get(
   '/:id',
   requireAuth,
   asyncHandler(async (req, res) => {
-    ok(res, await service.getBuddyRead(req.params.id!));
+    ok(res, await service.getBuddyRead(req.params.id!, userId(req)));
   }),
 );
 
@@ -101,5 +105,56 @@ buddyRouter.post(
         req.body.chapter ?? null,
       ),
     );
+  }),
+);
+
+/* ------------------------------- invitations ------------------------------ */
+
+buddyRouter.get(
+  '/:id/invitable-friends',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const search = typeof req.query.q === 'string' ? req.query.q.trim() : undefined;
+    ok(res, await service.invitableFriends(userId(req), req.params.id!, search));
+  }),
+);
+
+buddyRouter.post(
+  '/:id/invitations',
+  requireAuth,
+  validate(inviteSchema),
+  asyncHandler(async (req, res) => {
+    created(
+      res,
+      await service.inviteToBuddyRead(userId(req), req.params.id!, req.body.inviteeId),
+    );
+  }),
+);
+
+buddyRouter.get(
+  '/:id/invitations',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    ok(res, await service.listInvitations(userId(req), req.params.id!));
+  }),
+);
+
+buddyRouter.post(
+  '/:id/invitations/:invitationId/accept',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    ok(
+      res,
+      await service.acceptBuddyInvitation(userId(req), req.params.id!, req.params.invitationId!),
+    );
+  }),
+);
+
+buddyRouter.post(
+  '/:id/invitations/:invitationId/decline',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    await service.declineBuddyInvitation(userId(req), req.params.id!, req.params.invitationId!);
+    noContent(res);
   }),
 );

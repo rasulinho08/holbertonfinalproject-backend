@@ -21,6 +21,7 @@ const updateProfileSchema = z.object({
   username: usernameSchema.optional(),
   bio: z.string().trim().max(300).nullable().optional(),
   avatarUrl: z.string().url().nullable().optional(),
+  coverPhotoUrl: z.string().url().nullable().optional(),
   website: z.string().trim().url().max(500).nullable().optional(),
 });
 
@@ -57,6 +58,7 @@ usersRouter.patch(
         ...(req.body.username !== undefined && { username: req.body.username }),
         ...(req.body.bio !== undefined && { bio: req.body.bio }),
         ...(req.body.avatarUrl !== undefined && { avatarUrl: req.body.avatarUrl }),
+        ...(req.body.coverPhotoUrl !== undefined && { coverPhotoUrl: req.body.coverPhotoUrl }),
         ...(req.body.website !== undefined && { website: req.body.website }),
       },
     });
