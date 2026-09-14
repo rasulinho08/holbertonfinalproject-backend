@@ -137,6 +137,7 @@ model User {
   /// NULL for OAuth-only accounts.
   passwordHash String? @map("password_hash")
   avatarUrl    String? @map("avatar_url")
+  coverPhotoUrl String? @map("cover_photo_url")
   bio          String?
   website      String?
 
@@ -179,6 +180,8 @@ model User {
   ownedBuddyReads BuddyRead[]
   buddyMemberships BuddyReadMember[]
   buddyMessages   BuddyReadMessage[]
+  buddyInvitationsSent BuddyReadInvitation[] @relation("buddyInviter")
+  buddyInvitationsReceived BuddyReadInvitation[] @relation("buddyInvitee")
   cartItems       CartItem[]
   orders          Order[]
   giftCards       GiftCard[]
@@ -604,6 +607,32 @@ model BookListFollow {
 
 /* =============================== buddy reads ============================== */
 
+enum BuddyInvitationStatus {
+  pending
+  accepted
+  declined
+
+  @@map("buddy_invitation_status")
+}
+
+model BuddyReadInvitation {
+  id           String                @id @default(uuid()) @db.Uuid
+  buddyReadId  String                @map("buddy_read_id") @db.Uuid
+  inviterId    String                @map("inviter_id") @db.Uuid
+  inviteeId    String                @map("invitee_id") @db.Uuid
+  status       BuddyInvitationStatus @default(pending)
+  createdAt    DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  respondedAt  DateTime?             @map("responded_at") @db.Timestamptz(6)
+
+  buddyRead BuddyRead @relation(fields: [buddyReadId], references: [id], onDelete: Cascade)
+  inviter   User      @relation("buddyInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee   User      @relation("buddyInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([buddyReadId, inviteeId])
+  @@index([inviteeId, status])
+  @@map("buddy_read_invitations")
+}
+
 model BuddyRead {
   id         String    @id @default(uuid()) @db.Uuid
   name       String
@@ -616,6 +645,7 @@ model BuddyRead {
   owner    User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   members  BuddyReadMember[]
   messages BuddyReadMessage[]
+  invitations BuddyReadInvitation[]
 
   @@map("buddy_reads")
 }

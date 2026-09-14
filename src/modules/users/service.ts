@@ -40,6 +40,7 @@ export const userSummarySelect = {
   username: true,
   name: true,
   avatarUrl: true,
+  coverPhotoUrl: true,
 } as const;
 
 export interface UserStats {
@@ -100,6 +101,7 @@ export interface SerializedUser {
   name: string;
   email: string;
   avatarUrl: string | null;
+  coverPhotoUrl: string | null;
   bio: string | null;
   website: string | null;
   role: string;
@@ -161,6 +163,7 @@ export async function serializeUser(user: User, viewerId?: string | null): Promi
     // so the client's type holds, but carries nothing.
     email: isSelf ? user.email : '',
     avatarUrl: user.avatarUrl,
+    coverPhotoUrl: user.coverPhotoUrl,
     bio: user.bio,
     website: user.website,
     role: user.role,

@@ -23,6 +23,8 @@ export interface SerializedBuddyRead {
   members: { user: UserSummary; progressPage: number }[];
   targetDate: string | null;
   messagesCount: number;
+  /** The viewer's invitation to this group, when one is open. */
+  invitation?: { id: string; status: 'pending' | 'accepted' | 'declined' } | null;
   createdAt: string;
 }
 
@@ -95,10 +97,23 @@ export async function listBuddyReads(
   return { items, total };
 }
 
-export async function getBuddyRead(id: string): Promise<SerializedBuddyRead> {
+export async function getBuddyRead(
+  id: string,
+  viewerId?: string | null,
+): Promise<SerializedBuddyRead> {
   const row = await prisma.buddyRead.findUnique({ where: { id }, include: buddyInclude });
   if (!row) throw notFound('Buddy read');
-  return serialize(row as BuddyRow);
+  const result = serialize(row as BuddyRow);
+
+  if (viewerId) {
+    const invite = await prisma.buddyReadInvitation.findUnique({
+      where: { buddyReadId_inviteeId: { buddyReadId: id, inviteeId: viewerId } },
+      select: { id: true, status: true },
+    });
+    result.invitation = invite ?? null;
+  }
+
+  return result;
 }
 
 export async function createBuddyRead(
@@ -143,7 +158,7 @@ export async function joinBuddyRead(userId: string, id: string): Promise<Seriali
   const me = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
   await notify(group.ownerId, 'buddy_invite', { name: me?.name ?? '' }, `/buddy-reads/${id}`, userId);
 
-  return getBuddyRead(id);
+  return getBuddyRead(id, userId);
 }
 
 /**
@@ -267,7 +282,7 @@ export async function updateBuddyProgress(
   if (status === 'read') await checkGoalReached(userId);
   void evaluateBadges(userId).catch(() => undefined);
 
-  return getBuddyRead(id);
+  return getBuddyRead(id, userId);
 }
 
 /* -------------------------------- messages -------------------------------- */
@@ -340,6 +355,218 @@ export async function postMessage(
     chapter: message.chapter,
     createdAt: message.createdAt.toISOString(),
   };
+}
+
+/* ------------------------------- invitations ------------------------------ */
+
+export interface SerializedBuddyInvitation {
+  id: string;
+  buddyReadId: string;
+  inviter: UserSummary;
+  invitee: UserSummary;
+  status: 'pending' | 'accepted' | 'declined';
+  createdAt: string;
+  respondedAt: string | null;
+}
+
+function serializeInvitation(row: {
+  id: string;
+  buddyReadId: string;
+  inviter: { id: string; username: string; name: string; avatarUrl: string | null };
+  invitee: { id: string; username: string; name: string; avatarUrl: string | null };
+  status: 'pending' | 'accepted' | 'declined';
+  createdAt: Date;
+  respondedAt: Date | null;
+}): SerializedBuddyInvitation {
+  return {
+    id: row.id,
+    buddyReadId: row.buddyReadId,
+    inviter: serializeUserSummary(row.inviter),
+    invitee: serializeUserSummary(row.invitee),
+    status: row.status,
+    createdAt: row.createdAt.toISOString(),
+    respondedAt: row.respondedAt?.toISOString() ?? null,
+  };
+}
+
+/**
+ * People the caller follows who can still be invited: not themselves, not
+ * already a member, and not already holding an invitation.
+ *
+ * The client's "friends" are the people they follow — the `Follow` table is the
+ * social graph, so the candidate set comes from `follows.followerId = me`.
+ */
+export async function invitableFriends(
+  userId: string,
+  id: string,
+  search?: string,
+): Promise<{ user: UserSummary }[]> {
+  const group = await prisma.buddyRead.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!group) throw notFound('Buddy read');
+
+  const [memberIds, invitedIds] = await Promise.all([
+    prisma.buddyReadMember.findMany({
+      where: { buddyReadId: id },
+      select: { userId: true },
+    }),
+    prisma.buddyReadInvitation.findMany({
+      where: { buddyReadId: id },
+      select: { inviteeId: true },
+    }),
+  ]);
+  const excluded = new Set([userId, ...memberIds.map((m) => m.userId)]);
+  invitedIds.forEach((i) => excluded.add(i.inviteeId));
+
+  const rows = await prisma.follow.findMany({
+    where: {
+      followerId: userId,
+      ...(search
+        ? {
+            followee: {
+              OR: [
+                { name: { contains: search, mode: 'insensitive' } },
+                { username: { contains: search, mode: 'insensitive' } },
+              ],
+            },
+          }
+        : {}),
+    },
+    include: { followee: { select: userSummarySelect } },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+  });
+
+  return rows
+    .filter((r) => !excluded.has(r.followeeId))
+    .map((r) => ({ user: serializeUserSummary(r.followee) }));
+}
+
+/**
+ * Invite a friend into a group.
+ *
+ * Only members may invite. Inviting a member, yourself, or re-inviting an
+ * already-pending friend conflicts; an invitation that was declined can be
+ * sent again by flipping the row back to pending.
+ */
+export async function inviteToBuddyRead(
+  inviterId: string,
+  id: string,
+  inviteeId: string,
+): Promise<SerializedBuddyInvitation> {
+  if (inviterId === inviteeId) throw conflict('You cannot invite yourself');
+
+  const group = await prisma.buddyRead.findUnique({
+    where: { id },
+    select: { id: true, name: true },
+  });
+  if (!group) throw notFound('Buddy read');
+
+  const [membership, target] = await Promise.all([
+    prisma.buddyReadMember.count({ where: { buddyReadId: id, userId: inviterId } }),
+    prisma.user.findFirst({ where: { id: inviteeId, deletedAt: null } }),
+  ]);
+  if (membership === 0) throw forbidden('Only members can invite to a buddy read');
+  if (!target) throw notFound('User');
+  if ((await prisma.buddyReadMember.count({ where: { buddyReadId: id, userId: inviteeId } })) > 0) {
+    throw conflict('That user is already a member');
+  }
+
+  const existing = await prisma.buddyReadInvitation.findUnique({
+    where: { buddyReadId_inviteeId: { buddyReadId: id, inviteeId } },
+  });
+  if (existing && existing.status === 'pending') {
+    throw conflict('Invitation already sent');
+  }
+
+  const invitation = await prisma.buddyReadInvitation.upsert({
+    where: { buddyReadId_inviteeId: { buddyReadId: id, inviteeId } },
+    create: { buddyReadId: id, inviterId, inviteeId, status: 'pending' },
+    update: { status: 'pending', inviterId, respondedAt: null, createdAt: new Date() },
+    include: { inviter: { select: userSummarySelect }, invitee: { select: userSummarySelect } },
+  });
+
+  const me = await prisma.user.findUnique({ where: { id: inviterId }, select: { name: true } });
+  await notify(inviteeId, 'buddy_invite', { name: me?.name ?? '' }, `/buddy-reads/${id}`, inviterId);
+
+  return serializeInvitation(invitation);
+}
+
+/** Confirms an invitation is writable by this reader, and returns it. */
+async function assertInvitationOwner(
+  userId: string,
+  buddyReadId: string,
+  invitationId: string,
+) {
+  const invitation = await prisma.buddyReadInvitation.findUnique({
+    where: { id: invitationId },
+    include: { inviter: { select: userSummarySelect }, invitee: { select: userSummarySelect } },
+  });
+  if (!invitation || invitation.buddyReadId !== buddyReadId) throw notFound('Invitation');
+  if (invitation.inviteeId !== userId) throw forbidden('Only the invited reader can respond');
+  return invitation;
+}
+
+export async function acceptBuddyInvitation(
+  userId: string,
+  buddyReadId: string,
+  invitationId: string,
+): Promise<SerializedBuddyRead> {
+  const invitation = await assertInvitationOwner(userId, buddyReadId, invitationId);
+  if (invitation.status === 'accepted') return getBuddyRead(buddyReadId, userId);
+
+  await prisma.$transaction([
+    prisma.buddyReadInvitation.update({
+      where: { id: invitationId },
+      data: { status: 'accepted', respondedAt: new Date() },
+    }),
+    prisma.buddyReadMember.upsert({
+      where: { buddyReadId_userId: { buddyReadId, userId } },
+      create: { buddyReadId, userId, progressPage: 0 },
+      update: {},
+    }),
+  ]);
+
+  return getBuddyRead(buddyReadId, userId);
+}
+
+export async function declineBuddyInvitation(
+  userId: string,
+  buddyReadId: string,
+  invitationId: string,
+): Promise<void> {
+  const invitation = await assertInvitationOwner(userId, buddyReadId, invitationId);
+  if (invitation.status === 'pending') {
+    await prisma.buddyReadInvitation.update({
+      where: { id: invitationId },
+      data: { status: 'declined', respondedAt: new Date() },
+    });
+  }
+}
+
+/** All invitations to a group — members only, so the list is spoiler-safe. */
+export async function listInvitations(
+  userId: string,
+  buddyReadId: string,
+): Promise<SerializedBuddyInvitation[]> {
+  await assertMember(userId, buddyReadId);
+
+  const rows = await prisma.buddyReadInvitation.findMany({
+    where: { buddyReadId },
+    include: { inviter: { select: userSummarySelect }, invitee: { select: userSummarySelect } },
+    orderBy: { createdAt: 'desc' },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    buddyReadId: r.buddyReadId,
+    inviter: serializeUserSummary(r.inviter),
+    invitee: serializeUserSummary(r.invitee),
+    status: r.status,
+    createdAt: r.createdAt.toISOString(),
+    respondedAt: r.respondedAt?.toISOString() ?? null,
+  }));
 }
 
 export { conflict };
