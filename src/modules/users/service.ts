@@ -116,6 +116,7 @@ export interface SerializedUser {
   walletBalance: number;
   twoFactorEnabled: boolean;
   publisherId?: string;
+  onboardingCompleted: boolean;
 }
 
 /**
@@ -177,6 +178,7 @@ export async function serializeUser(user: User, viewerId?: string | null): Promi
     favoriteAuthorIds: favoriteAuthors.map((f) => f.authorId),
     walletBalance: isSelf ? money(user.walletBalance) : 0,
     twoFactorEnabled: user.twoFactorEnabled,
+    onboardingCompleted: user.onboardingCompleted,
     ...(user.publisherId && { publisherId: user.publisherId }),
   };
 }

@@ -150,6 +150,7 @@ model User {
   twoFactorEnabled Boolean  @default(false) @map("two_factor_enabled")
 
   favoriteGenres String[] @default([]) @map("favorite_genres")
+  onboardingCompleted Boolean @default(false) @map("onboarding_completed")
   locale         String   @default("az")
   /// IANA timezone; reading streaks and daily buckets are computed in it.
   timezone       String   @default("Asia/Baku")
