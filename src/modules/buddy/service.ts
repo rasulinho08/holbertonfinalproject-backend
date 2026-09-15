@@ -322,6 +322,13 @@ export async function leaveBuddyRead(userId: string, id: string): Promise<void> 
   });
   if (!group) throw notFound('Buddy read');
 
+  // Leaving a group you were never in is a no-op that answers 204, while an
+  // unknown id answers 404 — which told anyone holding a guessed id whether a
+  // private group existed. The read paths already refuse to confirm that, so
+  // this one has to as well.
+  const isMember = group.members.some((m) => m.userId === userId);
+  if (!isMember && group.isPrivate) throw notFound('Buddy read');
+
   await prisma.buddyReadMember.deleteMany({ where: { buddyReadId: id, userId } });
 
   if (group.ownerId !== userId) return;
