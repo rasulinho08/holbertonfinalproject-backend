@@ -145,6 +145,7 @@ usersRouter.patch(
         ...(req.body.favoriteGenres && {
           favoriteGenres: req.body.favoriteGenres.filter(isGenreSlug),
         }),
+        onboardingCompleted: true,
       },
     });
 
