@@ -116,6 +116,8 @@ export interface SerializedUser {
   walletBalance: number;
   twoFactorEnabled: boolean;
   publisherId?: string;
+  /** Set for role === 'author': the writer profile this account speaks for. */
+  authorId?: string;
 }
 
 /**
@@ -178,6 +180,7 @@ export async function serializeUser(user: User, viewerId?: string | null): Promi
     walletBalance: isSelf ? money(user.walletBalance) : 0,
     twoFactorEnabled: user.twoFactorEnabled,
     ...(user.publisherId && { publisherId: user.publisherId }),
+    ...(user.authorId && { authorId: user.authorId }),
   };
 }
 

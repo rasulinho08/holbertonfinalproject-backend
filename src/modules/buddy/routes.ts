@@ -13,7 +13,21 @@ const createSchema = z.object({
   name: z.string().trim().min(2, 'Name is too short').max(80, 'Name is too long'),
   bookId: z.string().uuid('bookId must be a valid id'),
   targetDate: z.string().datetime().nullable().optional(),
+  isPrivate: z.boolean().optional(),
 });
+
+const joinByCodeSchema = z.object({
+  code: z.string().trim().min(4, 'Enter the join code').max(16, 'That is not a join code'),
+});
+
+const settingsSchema = z
+  .object({
+    isPrivate: z.boolean().optional(),
+    regenerateCode: z.boolean().optional(),
+  })
+  .refine((v) => v.isPrivate !== undefined || v.regenerateCode !== undefined, {
+    message: 'Nothing to update',
+  });
 
 const progressSchema = z.object({
   page: z.coerce.number().int().min(0),
@@ -47,6 +61,15 @@ buddyRouter.post(
   }),
 );
 
+buddyRouter.post(
+  '/join-by-code',
+  requireAuth,
+  validate(joinByCodeSchema),
+  asyncHandler(async (req, res) => {
+    ok(res, await service.joinBuddyReadByCode(userId(req), req.body.code));
+  }),
+);
+
 buddyRouter.get(
   '/:id',
   requireAuth,
@@ -60,6 +83,15 @@ buddyRouter.post(
   requireAuth,
   asyncHandler(async (req, res) => {
     ok(res, await service.joinBuddyRead(userId(req), req.params.id!));
+  }),
+);
+
+buddyRouter.patch(
+  '/:id/settings',
+  requireAuth,
+  validate(settingsSchema),
+  asyncHandler(async (req, res) => {
+    ok(res, await service.updateBuddySettings(userId(req), req.params.id!, req.body));
   }),
 );
 
