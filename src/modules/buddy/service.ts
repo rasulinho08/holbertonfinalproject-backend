@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 import { prisma } from '../../lib/prisma.js';
 import { conflict, forbidden, notFound } from '../../lib/errors.js';
 import { localDateColumn } from '../../lib/dates.js';
@@ -23,9 +25,47 @@ export interface SerializedBuddyRead {
   members: { user: UserSummary; progressPage: number }[];
   targetDate: string | null;
   messagesCount: number;
+  /** Private groups are hidden from the public list and need a code to join. */
+  isPrivate: boolean;
+  /**
+   * The join code, and only for members — handing it to a non-member would
+   * make "private" decorative, since anyone who could read the group could
+   * also read the one secret that lets people in.
+   */
+  inviteCode: string | null;
   /** The viewer's invitation to this group, when one is open. */
   invitation?: { id: string; status: 'pending' | 'accepted' | 'declined' } | null;
   createdAt: string;
+}
+
+/**
+ * Join-code alphabet.
+ *
+ * No 0/O and no 1/I/L: a code is read off one screen and typed into another,
+ * often from a photo, and those pairs are the ones people get wrong.
+ */
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const CODE_LENGTH = 6;
+
+function mintCode(): string {
+  const bytes = randomBytes(CODE_LENGTH);
+  let code = '';
+  for (let i = 0; i < CODE_LENGTH; i += 1) {
+    code += CODE_ALPHABET[bytes[i]! % CODE_ALPHABET.length];
+  }
+  return code;
+}
+
+/**
+ * Normalises what a reader typed.
+ *
+ * Only case and separators need handling. The confusable glyphs are absent
+ * from the alphabet entirely, so there is nothing to map them onto: a code
+ * containing O, 0, I, 1 or L was mistyped, and should miss rather than be
+ * silently bent into somebody else's group.
+ */
+export function normalizeCode(raw: string): string {
+  return raw.trim().toUpperCase().replace(/[\s-]/g, '');
 }
 
 const buddyInclude = {
@@ -40,13 +80,21 @@ type BuddyRow = {
   bookId: string;
   ownerId: string;
   targetDate: Date | null;
+  isPrivate: boolean;
+  inviteCode: string;
   createdAt: Date;
   book: { id: string; title: string; coverUrl: string | null; pageCount: number; author: { name: string } };
   members: { progressPage: number; user: { id: string; username: string; name: string; avatarUrl: string | null } }[];
   _count: { messages: number };
 };
 
-function serialize(row: BuddyRow): SerializedBuddyRead {
+/**
+ * `viewerId` decides whether the join code is included. Pass it whenever one
+ * is known; a row serialized without it is safe to hand to anybody.
+ */
+function serialize(row: BuddyRow, viewerId?: string | null): SerializedBuddyRead {
+  const isMember = !!viewerId && row.members.some((m) => m.user.id === viewerId);
+
   return {
     id: row.id,
     name: row.name,
@@ -65,6 +113,8 @@ function serialize(row: BuddyRow): SerializedBuddyRead {
     })),
     targetDate: row.targetDate?.toISOString() ?? null,
     messagesCount: row._count.messages,
+    isPrivate: row.isPrivate,
+    inviteCode: isMember ? row.inviteCode : null,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -74,20 +124,33 @@ export async function listBuddyReads(
   skip: number,
   take: number,
 ): Promise<{ items: SerializedBuddyRead[]; total: number }> {
+  // A private group is visible only to its members and to anyone holding an
+  // open invitation to it. Filtering in the query rather than after the fetch
+  // matters: paginating first and hiding afterwards returns short pages and a
+  // total that counts rows the reader may not see.
+  const where = {
+    OR: [
+      { isPrivate: false },
+      { members: { some: { userId } } },
+      { invitations: { some: { inviteeId: userId, status: 'pending' as const } } },
+    ],
+  };
+
   const [rows, total] = await Promise.all([
     prisma.buddyRead.findMany({
+      where,
       include: buddyInclude,
       orderBy: { createdAt: 'desc' },
       skip,
       take,
     }),
-    prisma.buddyRead.count(),
+    prisma.buddyRead.count({ where }),
   ]);
 
   // The reader's own groups first, then discoverable ones — the screen shows
   // both, and "mine" is what they came for.
   const items = (rows as BuddyRow[])
-    .map(serialize)
+    .map((row) => serialize(row, userId))
     .sort((a, b) => {
       const mineA = a.members.some((m) => m.user.id === userId) ? 0 : 1;
       const mineB = b.members.some((m) => m.user.id === userId) ? 0 : 1;
@@ -103,14 +166,22 @@ export async function getBuddyRead(
 ): Promise<SerializedBuddyRead> {
   const row = await prisma.buddyRead.findUnique({ where: { id }, include: buddyInclude });
   if (!row) throw notFound('Buddy read');
-  const result = serialize(row as BuddyRow);
+  const result = serialize(row as BuddyRow, viewerId);
 
+  let invitation: { id: string; status: 'pending' | 'accepted' | 'declined' } | null = null;
   if (viewerId) {
-    const invite = await prisma.buddyReadInvitation.findUnique({
+    invitation = await prisma.buddyReadInvitation.findUnique({
       where: { buddyReadId_inviteeId: { buddyReadId: id, inviteeId: viewerId } },
       select: { id: true, status: true },
     });
-    result.invitation = invite ?? null;
+    result.invitation = invitation;
+  }
+
+  // Not found rather than forbidden: a private group should not confirm its own
+  // existence to someone guessing ids.
+  if (result.isPrivate) {
+    const isMember = !!viewerId && result.members.some((m) => m.user.id === viewerId);
+    if (!isMember && invitation?.status !== 'pending') throw notFound('Buddy read');
   }
 
   return result;
@@ -118,7 +189,7 @@ export async function getBuddyRead(
 
 export async function createBuddyRead(
   ownerId: string,
-  input: { name: string; bookId: string; targetDate?: string | null },
+  input: { name: string; bookId: string; targetDate?: string | null; isPrivate?: boolean },
 ): Promise<SerializedBuddyRead> {
   const book = await prisma.book.findFirst({
     where: { id: input.bookId, deletedAt: null },
@@ -126,28 +197,93 @@ export async function createBuddyRead(
   });
   if (!book) throw notFound('Book');
 
-  const created = await prisma.buddyRead.create({
-    data: {
-      name: input.name.trim(),
-      bookId: input.bookId,
-      ownerId,
-      targetDate: input.targetDate ? new Date(input.targetDate) : null,
-      // The creator is the first member; a group with no members would not
-      // render and could not be joined meaningfully.
-      members: { create: { userId: ownerId, progressPage: 0 } },
-    },
-    include: buddyInclude,
-  });
+  // Retry on the unique index rather than pre-checking. A SELECT before the
+  // INSERT is not a reservation — two groups created in the same instant can
+  // both see the code as free — whereas the index cannot be raced.
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const created = await prisma.buddyRead.create({
+        data: {
+          name: input.name.trim(),
+          bookId: input.bookId,
+          ownerId,
+          targetDate: input.targetDate ? new Date(input.targetDate) : null,
+          isPrivate: input.isPrivate ?? false,
+          inviteCode: mintCode(),
+          // The creator is the first member; a group with no members would not
+          // render and could not be joined meaningfully.
+          members: { create: { userId: ownerId, progressPage: 0 } },
+        },
+        include: buddyInclude,
+      });
 
-  return serialize(created as BuddyRow);
+      return serialize(created as BuddyRow, ownerId);
+    } catch (error) {
+      if (!isInviteCodeCollision(error)) throw error;
+    }
+  }
+
+  throw conflict('Could not allocate a join code, please try again');
+}
+
+/** True for a unique-constraint violation on `buddy_reads.invite_code`. */
+function isInviteCodeCollision(error: unknown): boolean {
+  const e = error as { code?: string; meta?: { target?: unknown } };
+  if (e?.code !== 'P2002') return false;
+  const target = e.meta?.target;
+  const asText = Array.isArray(target) ? target.join(',') : String(target ?? '');
+  return asText.includes('invite_code');
 }
 
 export async function joinBuddyRead(userId: string, id: string): Promise<SerializedBuddyRead> {
   const group = await prisma.buddyRead.findUnique({
     where: { id },
-    select: { id: true, ownerId: true, name: true },
+    select: { id: true, ownerId: true, name: true, isPrivate: true },
   });
   if (!group) throw notFound('Buddy read');
+
+  // A private group is joinable only through an invitation or the code. Open
+  // joining here would be a back door around both.
+  if (group.isPrivate) {
+    const invited = await prisma.buddyReadInvitation.count({
+      where: { buddyReadId: id, inviteeId: userId, status: 'pending' },
+    });
+    const alreadyIn = await prisma.buddyReadMember.count({ where: { buddyReadId: id, userId } });
+    if (invited === 0 && alreadyIn === 0) throw notFound('Buddy read');
+  }
+
+  return admitMember(userId, id, group.ownerId);
+}
+
+/**
+ * Joins the group that owns `code`.
+ *
+ * The code is the whole credential, so a wrong one must not reveal whether a
+ * group with that code exists — the same not-found either way.
+ */
+export async function joinBuddyReadByCode(
+  userId: string,
+  rawCode: string,
+): Promise<SerializedBuddyRead> {
+  const code = normalizeCode(rawCode);
+  if (code.length === 0) throw notFound('Buddy read');
+
+  const group = await prisma.buddyRead.findUnique({
+    where: { inviteCode: code },
+    select: { id: true, ownerId: true },
+  });
+  if (!group) throw notFound('Buddy read');
+
+  return admitMember(userId, group.id, group.ownerId);
+}
+
+/** Adds the reader to a group and tells the owner. Shared by both join paths. */
+async function admitMember(
+  userId: string,
+  id: string,
+  ownerId: string,
+): Promise<SerializedBuddyRead> {
+  const existing = await prisma.buddyReadMember.count({ where: { buddyReadId: id, userId } });
 
   await prisma.buddyReadMember.upsert({
     where: { buddyReadId_userId: { buddyReadId: id, userId } },
@@ -155,8 +291,19 @@ export async function joinBuddyRead(userId: string, id: string): Promise<Seriali
     update: {},
   });
 
-  const me = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
-  await notify(group.ownerId, 'buddy_invite', { name: me?.name ?? '' }, `/buddy-reads/${id}`, userId);
+  // Any open invitation is spent — otherwise the group keeps showing an
+  // "accept or decline" prompt to somebody who is already inside.
+  await prisma.buddyReadInvitation.updateMany({
+    where: { buddyReadId: id, inviteeId: userId, status: 'pending' },
+    data: { status: 'accepted', respondedAt: new Date() },
+  });
+
+  // Only on the first join. Re-entering an existing membership is a no-op and
+  // should not ping the owner again.
+  if (existing === 0) {
+    const me = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+    await notify(ownerId, 'buddy_invite', { name: me?.name ?? '' }, `/buddy-reads/${id}`, userId);
+  }
 
   return getBuddyRead(id, userId);
 }
@@ -174,6 +321,13 @@ export async function leaveBuddyRead(userId: string, id: string): Promise<void> 
     include: { members: { orderBy: { joinedAt: 'asc' } } },
   });
   if (!group) throw notFound('Buddy read');
+
+  // Leaving a group you were never in is a no-op that answers 204, while an
+  // unknown id answers 404 — which told anyone holding a guessed id whether a
+  // private group existed. The read paths already refuse to confirm that, so
+  // this one has to as well.
+  const isMember = group.members.some((m) => m.userId === userId);
+  if (!isMember && group.isPrivate) throw notFound('Buddy read');
 
   await prisma.buddyReadMember.deleteMany({ where: { buddyReadId: id, userId } });
 
@@ -406,6 +560,9 @@ export async function invitableFriends(
     select: { id: true },
   });
   if (!group) throw notFound('Buddy read');
+  // Only members invite, so only members get the candidate list. Otherwise a
+  // private group confirms its own existence to anyone who asks.
+  await assertMember(userId, id);
 
   const [memberIds, invitedIds] = await Promise.all([
     prisma.buddyReadMember.findMany({
@@ -567,6 +724,46 @@ export async function listInvitations(
     createdAt: r.createdAt.toISOString(),
     respondedAt: r.respondedAt?.toISOString() ?? null,
   }));
+}
+
+/**
+ * Owner-only settings: flip privacy, or mint a fresh code.
+ *
+ * Regenerating matters once a code has been shared too widely — it is the only
+ * way to shut an old one out, since there is nothing else to revoke.
+ */
+export async function updateBuddySettings(
+  userId: string,
+  id: string,
+  input: { isPrivate?: boolean; regenerateCode?: boolean },
+): Promise<SerializedBuddyRead> {
+  const group = await prisma.buddyRead.findUnique({
+    where: { id },
+    select: { id: true, ownerId: true },
+  });
+  if (!group) throw notFound('Buddy read');
+  if (group.ownerId !== userId) throw forbidden('Only the owner can change these settings');
+
+  const data: { isPrivate?: boolean; inviteCode?: string } = {};
+  if (input.isPrivate !== undefined) data.isPrivate = input.isPrivate;
+
+  if (input.regenerateCode) {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        await prisma.buddyRead.update({ where: { id }, data: { ...data, inviteCode: mintCode() } });
+        return getBuddyRead(id, userId);
+      } catch (error) {
+        if (!isInviteCodeCollision(error)) throw error;
+      }
+    }
+    throw conflict('Could not allocate a join code, please try again');
+  }
+
+  if (Object.keys(data).length > 0) {
+    await prisma.buddyRead.update({ where: { id }, data });
+  }
+
+  return getBuddyRead(id, userId);
 }
 
 export { conflict };

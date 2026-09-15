@@ -1,6 +1,6 @@
 import argon2 from 'argon2';
 import { authenticator } from 'otplib';
-import type { Prisma, ShelfStatus, User } from '@prisma/client';
+import type { Prisma, ShelfStatus, User, UserRole } from '@prisma/client';
 import { prisma, isUniqueViolation } from '../../lib/prisma.js';
 import { ApiError, badRequest, notFound, unauthorized } from '../../lib/errors.js';
 import { logger } from '../../lib/logger.js';
@@ -17,6 +17,8 @@ import {
 import { serializeUser, type SerializedUser } from '../users/service.js';
 import { sendPasswordResetEmail } from '../../integrations/mail.js';
 import { verifyOAuthToken, type OAuthProvider } from '../../integrations/oauth.js';
+import { slugify } from '../lists/service.js';
+import type { RegisterInput } from './schemas.js';
 
 export interface AuthSession {
   accessToken: string;
@@ -85,7 +87,7 @@ async function createUserWithDefaults(
 /* -------------------------------- register -------------------------------- */
 
 export async function register(
-  input: { name: string; username: string; email: string; password: string },
+  input: RegisterInput,
   context: SessionContext,
 ): Promise<AuthSession> {
   // Checked up front so the error names the specific field, then caught again
@@ -99,6 +101,38 @@ export async function register(
   if (usernameTaken > 0) throw new ApiError('USERNAME_TAKEN', 'That username is taken');
 
   const passwordHash = await argon2.hash(input.password, ARGON_OPTIONS);
+  const accountType = input.accountType ?? 'reader';
+
+  // The writer's author page and the publisher's imprint are created before
+  // the account, so the account row can point at them in a single insert and
+  // never exists in a half-configured state.
+  let extra: { role: UserRole; authorId?: string; publisherId?: string } = { role: 'user' };
+
+  if (accountType === 'author') {
+    const penName = input.penName?.trim() || input.name.trim();
+    const author = await prisma.author.create({
+      data: {
+        name: penName,
+        slug: await uniqueAuthorSlug(slugify(penName) || 'author'),
+        bio: input.bio?.trim() ?? '',
+      },
+      select: { id: true },
+    });
+    extra = { role: 'author', authorId: author.id };
+  }
+
+  if (accountType === 'publisher') {
+    const publisherName = input.publisherName!.trim();
+    const publisher = await prisma.publisher.create({
+      data: {
+        name: publisherName,
+        slug: await uniquePublisherSlug(slugify(publisherName) || 'publisher'),
+        ...(input.publisherCity?.trim() ? { city: input.publisherCity.trim() } : {}),
+      },
+      select: { id: true },
+    });
+    extra = { role: 'publisher', publisherId: publisher.id };
+  }
 
   try {
     const user = await createUserWithDefaults({
@@ -106,9 +140,22 @@ export async function register(
       username: input.username,
       email: input.email,
       passwordHash,
+      role: extra.role,
+      ...(input.bio?.trim() ? { bio: input.bio.trim() } : {}),
+      ...(extra.authorId ? { authorProfile: { connect: { id: extra.authorId } } } : {}),
+      ...(extra.publisherId ? { publisher: { connect: { id: extra.publisherId } } } : {}),
     });
     return await buildSession(user, context);
   } catch (error) {
+    // The author/publisher row was created first, so a failed insert here would
+    // otherwise leave an orphan imprint nobody owns.
+    if (extra.authorId) {
+      await prisma.author.delete({ where: { id: extra.authorId } }).catch(() => undefined);
+    }
+    if (extra.publisherId) {
+      await prisma.publisher.delete({ where: { id: extra.publisherId } }).catch(() => undefined);
+    }
+
     if (isUniqueViolation(error)) {
       const target = (error.meta?.target as string[] | undefined)?.join(',') ?? '';
       throw target.includes('email')
@@ -117,6 +164,25 @@ export async function register(
     }
     throw error;
   }
+}
+
+/** Slug helpers. Suffixed until free — two writers may share a pen name. */
+async function uniqueAuthorSlug(base: string): Promise<string> {
+  if ((await prisma.author.count({ where: { slug: base } })) === 0) return base;
+  for (let i = 2; i < 200; i += 1) {
+    const candidate = `${base}-${i}`;
+    if ((await prisma.author.count({ where: { slug: candidate } })) === 0) return candidate;
+  }
+  return `${base}-${Date.now().toString(36)}`;
+}
+
+async function uniquePublisherSlug(base: string): Promise<string> {
+  if ((await prisma.publisher.count({ where: { slug: base } })) === 0) return base;
+  for (let i = 2; i < 200; i += 1) {
+    const candidate = `${base}-${i}`;
+    if ((await prisma.publisher.count({ where: { slug: candidate } })) === 0) return candidate;
+  }
+  return `${base}-${Date.now().toString(36)}`;
 }
 
 /* ---------------------------------- login --------------------------------- */

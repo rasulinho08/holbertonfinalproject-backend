@@ -25,6 +25,8 @@ datasource db {
 
 enum UserRole {
   user
+  /// A writer. Owns an `Author` profile and can see their own readership.
+  author
   publisher
   admin
 
@@ -143,6 +145,8 @@ model User {
 
   role        UserRole @default(user)
   publisherId String?  @map("publisher_id") @db.Uuid
+  /// Set for role === 'author': the writer profile this account speaks for.
+  authorId    String?  @map("author_id") @db.Uuid
 
   walletBalance Decimal @default(0) @map("wallet_balance") @db.Decimal(10, 2)
 
@@ -160,6 +164,7 @@ model User {
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   publisher       Publisher? @relation(fields: [publisherId], references: [id], onDelete: SetNull)
+  authorProfile   Author?    @relation("authorAccount", fields: [authorId], references: [id], onDelete: SetNull)
 
   favoriteAuthors UserFavoriteAuthor[]
   refreshTokens   RefreshToken[]
@@ -301,6 +306,7 @@ model Author {
   books         Book[]
   followers     AuthorFollow[]
   favouritedBy  UserFavoriteAuthor[]
+  accounts      User[]               @relation("authorAccount")
 
   @@map("authors")
 }
@@ -640,6 +646,12 @@ model BuddyRead {
   bookId     String    @map("book_id") @db.Uuid
   ownerId    String    @map("owner_id") @db.Uuid
   targetDate DateTime? @map("target_date") @db.Timestamptz(6)
+  /// A private group is not listed to anyone outside it. The only ways in are
+  /// an invitation or the join code below.
+  isPrivate  Boolean   @default(false) @map("is_private")
+  /// Short, human-readable join code. Every group gets one so a group can be
+  /// flipped to private later without needing a second migration to backfill.
+  inviteCode String    @unique @map("invite_code")
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   book     Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)

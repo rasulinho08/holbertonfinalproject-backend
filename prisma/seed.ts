@@ -557,7 +557,21 @@ async function main() {
   /* ------------------------------ buddy reads ----------------------------- */
 
   const buddyReads = load<SeedBuddyRead>('buddy_reads');
-  for (const br of buddyReads) {
+  // Deterministic codes, so a seeded database always hands QA the same ones.
+  // The last group is seeded private: without one, the private path has
+  // nothing to exercise until somebody creates a group by hand.
+  const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const seededCode = (index: number): string => {
+    let value = index + 1;
+    let code = '';
+    for (let i = 0; i < 6; i += 1) {
+      code = CODE_CHARS[value % CODE_CHARS.length]! + code;
+      value = Math.floor(value / CODE_CHARS.length) + 7 * (i + 1);
+    }
+    return code;
+  };
+
+  for (const [index, br] of buddyReads.entries()) {
     await prisma.buddyRead.create({
       data: {
         id: uuidFor(br.id),
@@ -565,6 +579,8 @@ async function main() {
         bookId: uuidFor(br.bookId),
         ownerId: uuidFor(br.ownerId),
         targetDate: date(br.targetDate),
+        isPrivate: index === buddyReads.length - 1 && buddyReads.length > 1,
+        inviteCode: seededCode(index),
         createdAt: new Date(br.createdAt),
         members: {
           createMany: {
