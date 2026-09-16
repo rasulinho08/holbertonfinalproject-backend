@@ -21,7 +21,7 @@ const updateProfileSchema = z.object({
   username: usernameSchema.optional(),
   bio: z.string().trim().max(300).nullable().optional(),
   avatarUrl: z.string().url().nullable().optional(),
-  coverPhotoUrl: z.string().url().nullable().optional(),
+  coverPhotoUrl: z.string().nullable().optional(),
   website: z.string().trim().url().max(500).nullable().optional(),
 });
 
