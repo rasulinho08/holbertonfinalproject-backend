@@ -24,7 +24,16 @@ export async function storeUpload(uri: string, kind: string): Promise<StoredFile
 
   if (!env.S3_BUCKET || !env.S3_ACCESS_KEY) {
     logger.info({ kind, id }, '[storage:stub] recorded upload without transferring bytes');
-    return { id, url: uri };
+    // Return a persistent URL based on the generated ID and kind.
+    // The file on disk is named ${id}-${kind}, and the file server route is
+    // GET /api/v1/uploads/files/:filename, so the URL must include the kind
+    // so the browser can fetch the correct file.
+    // The API client (client.ts) prepends API_BASE_URL which already includes /api/v1,
+    // so the final URL in production will be: https://backend.onrender.com/api/v1/uploads/files/${id}-${kind}
+    // In development: http://localhost:4000/api/v1/uploads/files/${id}-${kind}
+    // The frontend renders it via: <Image source={{ uri: user.coverPhotoUrl }} />
+    const persistentUrl = `/uploads/files/${id}-${kind}`;
+    return { id, url: persistentUrl };
   }
 
   // Implement the S3 PUT here. Left explicit rather than half-written: silently
