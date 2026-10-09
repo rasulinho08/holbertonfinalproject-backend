@@ -127,8 +127,6 @@ function serializeFull(row: {
   };
 }
 
-const authorSelect = { author: { select: userSummarySelect } } as const;
-
 /* --------------------------------- reads --------------------------------- */
 
 export async function listPublications(
