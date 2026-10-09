@@ -98,9 +98,23 @@ o anda qazanıldı. Tam təsdiqlənib.
 
 ## Test
 
-Vahid test faylı yoxdur (vitest qurulub, amma boşdur). `npm run smoke` (auth +
-kataloq) və `npm run smoke:full` (bütün modullar) canlı/lokal API-yə qarşı
-işləyir — TypeScript yoxdur, HTTP cavabları yoxlayır.
+- `npm test` — Vitest + Supertest integration suite (`tests/`) against a real
+  PostgreSQL. Each run creates its own `kitabdostu_test_<random>` database
+  through `TEST_DATABASE_URL` (default
+  `postgresql://kitabdostu:kitabdostu@localhost:5432/postgres`; the role needs
+  CREATEDB), applies the migrations, seeds it and drops it at the end — it
+  never resets an existing database.
+- `npm run lint` — `eslint.config.js` (flat config, typescript-eslint).
+- `npm run smoke` / `npm run smoke:full` — HTTP checks against a running API.
+- CI (`.github/workflows/ci.yml`) runs typecheck, lint, build, tests, then
+  boots the built server and runs both smoke suites.
 
-`npm run lint` işləmir — `eslint.config.js` mövcud deyil, əvvəldən belədir
-(bu sessiyanın işi ilə əlaqəsi yoxdur).
+## Son iş (2026-10-09)
+
+- `users/service.ts` merge b35232a-də kəsilmişdi (build sınırdı, server açılmırdı,
+  Render deploy-ları o vaxtdan uğursuz idi) — bərpa olundu.
+- Checkout cüzdandan endirimsiz məbləği çıxırdı; stok/cüzdan/hədiyyə kartı
+  yarışları şərti update-lərlə bağlandı (`tests/commerce.test.ts`).
+- Şəkil yükləmə real oldu: `media_files` cədvəli, `POST /uploads {kind,data}`,
+  `GET /uploads/files/:id`. Hesab silinəndə şəkillər də silinir.
+- OCR stub-u production-da saxta mətn qaytarmır (`available: false`).
