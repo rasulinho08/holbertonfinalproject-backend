@@ -664,9 +664,9 @@ async function main() {
 
   await prisma.giftCard.createMany({
     data: [
-      { code: 'KITAB10', amount: decimal(10) },
-      { code: 'KITAB25', amount: decimal(25) },
-      { code: 'HEDIYYE5', amount: decimal(5) },
+      { code: 'DEV_GIFT_CARD_DEMO', amount: decimal(0) },
+      { code: 'DEV_GIFT_CARD_TEST', amount: decimal(0) },
+      { code: 'DEV_GIFT_CARD_DEV', amount: decimal(0) },
     ],
   });
 

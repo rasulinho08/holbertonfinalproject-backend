@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { env } from '../config/env.js';
 import { logger } from '../lib/logger.js';
+import { prisma } from '../lib/prisma.js';
 
 /**
  * Card payments, via Payriff (MilliKart).
@@ -55,7 +56,7 @@ export async function chargeCard(orderCode: string, amount: number): Promise<Cha
     }),
   });
 
-  const raw = await res.json().catch(() => ({}));
+  const raw = await res.json().catch(() => ({} as Prisma.InputJsonValue));
 
   if (!res.ok) {
     logger.warn({ status: res.status, orderCode }, 'Payriff rejected the charge');
@@ -72,7 +73,25 @@ export async function chargeCard(orderCode: string, amount: number): Promise<Cha
 
 export async function verifyPayment(reference: string): Promise<{ status: string }> {
   if (!env.PAYRIFF_MERCHANT_ID || !env.PAYRIFF_SECRET_KEY) {
-    return { status: reference.startsWith('failed_') ? 'failed' : 'paid' };
+    // In stub/dev mode, never auto-approve — always pending until a real provider
+    // validates the payment. This prevents marking unverified payments as paid.
+    return { status: 'pending' };
+  }
+
+  // Check if this reference has already been recorded as paid (idempotency)
+  const existingPayment = await prisma.payment.findFirst({
+    where: { reference },
+    include: { order: true },
+  });
+
+  if (existingPayment) {
+    if (existingPayment.status === 'paid') {
+      // Already successfully paid — return idempotently; do not re-advance order.
+      return { status: 'paid' };
+    }
+    if (existingPayment.status === 'failed') {
+      return { status: 'failed' };
+    }
   }
 
   const res = await fetch(`${env.PAYRIFF_BASE_URL}/getStatusOrder`, {
@@ -83,5 +102,22 @@ export async function verifyPayment(reference: string): Promise<{ status: string
 
   if (!res.ok) return { status: 'failed' };
   const raw = (await res.json()) as { payload?: { orderStatus?: string } };
-  return { status: raw.payload?.orderStatus === 'APPROVED' ? 'paid' : 'pending' };
+  const status = raw.payload?.orderStatus === 'APPROVED' ? 'paid' : 'pending';
+
+  // Record the verification result for idempotency and audit
+  await prisma.payment.upsert({
+    where: { reference },
+    create: {
+      reference,
+      status,
+      amount: 0, // amount unknown from verification alone; order total is separate
+      rawResponse: raw,
+    },
+    update: {
+      status,
+      rawResponse: raw,
+    },
+  });
+
+  return { status };
 }

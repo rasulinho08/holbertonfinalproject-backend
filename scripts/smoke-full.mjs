@@ -521,9 +521,10 @@ check('GET /wallet', wallet.status === 200 && typeof wallet.json?.data?.balance 
 // Gift cards are single-use by design, so a re-run against an already-seeded
 // database finds them spent. Walk the seeded codes until one is unused; if all
 // three are gone, that is a correct state rather than a failure.
+// Codes are now DEV prefixed and have no monetary value in production.
 let redeemed = null;
-let lastCode = 'KITAB10';
-for (const code of ['KITAB10', 'KITAB25', 'HEDIYYE5']) {
+let lastCode = 'DEV_GIFT_CARD_DEMO';
+for (const code of ['DEV_GIFT_CARD_DEMO', 'DEV_GIFT_CARD_TEST', 'DEV_GIFT_CARD_DEV']) {
   lastCode = code;
   const attempt = await call('POST', '/gift-cards/redeem', { code });
   if (attempt.status === 200) {

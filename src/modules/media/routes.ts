@@ -12,6 +12,9 @@ import path from 'node:path';
 
 import { env } from '../../config/env.js';
 
+// Uploads directory - local storage for development; S3 in production
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+
 /* -------------------------------- uploads --------------------------------- */
 
 export const uploadsRouter: Router = Router();
@@ -54,11 +57,25 @@ export const uploadsFileRouter: Router = Router();
 
 uploadsFileRouter.get(
   '/:filename',
+  requireAuth,
   asyncHandler(async (req, res) => {
     const { filename } = req.params;
-    const filepath = path.join(UPLOADS_DIR, filename);
-    if (fs.existsSync(filepath)) {
-      res.sendFile(filepath);
+    // Sanitize filename: use basename to strip any directory components,
+    // preventing path traversal attacks like ../../../etc/passwd.
+    // Also reject absolute paths and encoded traversal sequences.
+    const safeFilename = path.basename(filename) || 'placeholder';
+    if (!safeFilename) {
+      return notFoundHandler(req, res);
+    }
+    const filepath = path.join(UPLOADS_DIR, safeFilename);
+    // Additional safety: verify the resolved path is within UPLOADS_DIR
+    // by checking that the normalized path starts with the uploads directory.
+    const normalizedPath = path.normalize(filepath);
+    if (!normalizedPath.startsWith(path.normalize(UPLOADS_DIR) + path.sep) && normalizedPath !== path.normalize(UPLOADS_DIR)) {
+      return notFoundHandler(req, res);
+    }
+    if (fs.existsSync(normalizedPath)) {
+      res.sendFile(normalizedPath);
     } else {
       notFoundHandler(req, res);
     }
