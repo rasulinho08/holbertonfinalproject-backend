@@ -62,6 +62,13 @@ export const uploadLimiter = rateLimit({
   limit: env.isProduction ? 30 : 1000,
 });
 
+/**
+ * The book assistant calls an external model on every message, and the free
+ * Gemini tier has a small per-minute quota shared by every reader: 20 a minute
+ * per reader covers a real conversation and stops one account using it all.
+ */
+export const assistantLimiter = rateLimit({ ...shared, windowMs: 60 * 1000, limit: 20 });
+
 /** OCR calls a paid third party, so it keeps its tight budget everywhere. */
 export const ocrLimiter = rateLimit({ ...shared, windowMs: 60 * 60 * 1000, limit: 30 });
 
