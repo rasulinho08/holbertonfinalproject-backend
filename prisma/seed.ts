@@ -664,9 +664,13 @@ async function main() {
 
   await prisma.giftCard.createMany({
     data: [
-      { code: 'KITAB10', amount: decimal(10) },
-      { code: 'KITAB25', amount: decimal(25) },
-      { code: 'HEDIYYE5', amount: decimal(5) },
+      // Development-only cards. The DEV_ prefix is refused in production by
+      // resolveGiftCard (commerce/service.ts), so they carry no real value
+      // there. The amounts must stay positive: gift_cards has a CHECK
+      // constraint (gift_amount_positive), and 0 made the whole seed fail.
+      { code: 'DEV_GIFT_CARD_DEMO', amount: decimal(10) },
+      { code: 'DEV_GIFT_CARD_TEST', amount: decimal(25) },
+      { code: 'DEV_GIFT_CARD_DEV', amount: decimal(5) },
     ],
   });
 

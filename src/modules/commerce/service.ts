@@ -2,6 +2,7 @@ import type { DeliveryMethod, OrderStatus, PaymentMethod, Prisma } from '@prisma
 import { prisma, money } from '../../lib/prisma.js';
 import { ApiError, badRequest, conflict, forbidden, notFound, outOfStock } from '../../lib/errors.js';
 import { logger } from '../../lib/logger.js';
+import { env } from '../../config/env.js';
 import { bookInclude, serializeBook, type SerializedBook } from '../books/service.js';
 import { notify } from '../notifications/service.js';
 import { chargeCard } from '../../integrations/payments.js';
@@ -406,7 +407,13 @@ export async function checkout(
 }
 
 async function resolveGiftCard(code: string) {
-  const card = await prisma.giftCard.findUnique({ where: { code: code.trim().toUpperCase() } });
+  const trimmedCode = code.trim().toUpperCase();
+  // In production, reject development/test gift card codes that have no
+  // real monetary value, to prevent accidental use of dev data.
+  if (env.isProduction && trimmedCode.startsWith('DEV_')) {
+    throw badRequest('Gift card codes starting with DEV_ are not valid in production');
+  }
+  const card = await prisma.giftCard.findUnique({ where: { code: trimmedCode } });
   if (!card) throw badRequest('That gift card code is not valid', { giftCardCode: 'invalid' });
   if (card.usedAt) throw conflict('That gift card has already been used');
   if (card.expiresAt && card.expiresAt < new Date()) {
