@@ -47,15 +47,16 @@ uploadsRouter.post(
 
 /**
  * Serves an uploaded image. Public on purpose — avatars and covers appear on
- * public profiles — but only by unguessable id. A file's bytes never change
- * for a given id, so it can be cached forever.
+ * public profiles — but only by unguessable id. Cached for an hour rather than
+ * forever: files are deleted when a photo is replaced or an account is
+ * removed, and an immutable year-long cache would keep serving them.
  */
 uploadsRouter.get(
   '/files/:id',
   asyncHandler(async (req, res) => {
     const file = await getImage(req.params.id ?? '');
     res.setHeader('Content-Type', file.mimeType);
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
     res.setHeader('Content-Disposition', 'inline');
     res.end(file.data);

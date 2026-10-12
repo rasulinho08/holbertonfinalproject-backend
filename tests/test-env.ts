@@ -50,4 +50,6 @@ export const testEnv: Record<string, string> = {
   JWT_REFRESH_TTL: '30d',
   CORS_ORIGINS: 'http://localhost:8081',
   SEED_PASSWORD: TEST_SEED_PASSWORD,
+  // Small enough for the quota test to reach with a handful of tiny images.
+  UPLOAD_QUOTA_BYTES: '600',
 };

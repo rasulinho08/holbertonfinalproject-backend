@@ -67,8 +67,10 @@ if (!flag('--confirm')) {
 const randomPassword = () => crypto.randomBytes(18).toString('base64url');
 
 const prisma = new PrismaClient();
-const results: { email: string; password: string }[] = [];
 const missing: string[] = [];
+let updated = 0;
+
+console.log(`\nSetting passwords on ${host}. Store each one as it is printed; they are not saved anywhere:\n`);
 
 try {
   for (const email of emails) {
@@ -87,13 +89,15 @@ try {
         data: { revokedAt: new Date() },
       }),
     ]);
-    results.push({ email, password });
+    // Printed straight after its own transaction commits, so a failure on a
+    // later account can never leave an earlier one with an unknown password.
+    console.log(`  ${email.padEnd(28)} ${password}`);
+    updated += 1;
   }
 } finally {
   await prisma.$disconnect();
 }
 
-console.log(`\nUpdated ${results.length} account(s) on ${host}. Store these now; they are not saved anywhere:\n`);
-for (const r of results) console.log(`  ${r.email.padEnd(28)} ${r.password}`);
-if (missing.length) console.log(`\nNot found (skipped): ${missing.join(', ')}`);
+console.log(`\nUpdated ${updated} account(s).`);
+if (missing.length) console.log(`Not found (skipped): ${missing.join(', ')}`);
 console.log('');

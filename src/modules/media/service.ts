@@ -50,6 +50,15 @@ export async function saveImage(
     });
   }
 
+  // Uploads live in the primary database, so one account must not be able to
+  // fill it: the rate limit bounds how fast, this bounds how much.
+  const used = await prisma.mediaFile.aggregate({ where: { ownerId }, _sum: { size: true } });
+  if ((used._sum.size ?? 0) + bytes.length > env.UPLOAD_QUOTA_BYTES) {
+    throw new ApiError('VALIDATION_ERROR', 'Image storage limit reached for this account', {
+      data: 'Image storage limit reached for this account',
+    });
+  }
+
   const file = await prisma.mediaFile.create({
     data: { ownerId, kind, mimeType, size: bytes.length, data: new Uint8Array(bytes) },
     select: { id: true },

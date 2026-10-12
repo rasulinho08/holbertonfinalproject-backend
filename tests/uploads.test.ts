@@ -21,7 +21,7 @@ describe('uploads', () => {
     expect(file.status).toBe(200);
     // The client claimed JPEG; the bytes are PNG, and the bytes win.
     expect(file.headers['content-type']).toBe('image/png');
-    expect(file.headers['cache-control']).toContain('immutable');
+    expect(file.headers['cache-control']).toBe('public, max-age=3600');
     expect(Buffer.from(file.body).equals(Buffer.from(PNG, 'base64'))).toBe(true);
   });
 
@@ -59,6 +59,18 @@ describe('uploads', () => {
 
     await api().delete(`${API}/users/me`).set(...bearer(session)).expect(204);
     expect((await api().get(`${API}/uploads/files/${second.id}`)).status).toBe(404);
+  });
+
+  it('stops an account at its storage quota', async () => {
+    const session = await registerReader();
+    // The test quota is 600 bytes; this PNG is 70, so the 9th upload is refused.
+    const statuses: number[] = [];
+    for (let i = 0; i < 9; i += 1) {
+      const res = await api().post(`${API}/uploads`).set(...bearer(session)).send({ kind: 'avatar', data: PNG });
+      statuses.push(res.status);
+    }
+    expect(statuses.slice(0, 8)).toEqual(Array(8).fill(201));
+    expect(statuses[8]).toBe(422);
   });
 
   it('profile links must be http(s)', async () => {

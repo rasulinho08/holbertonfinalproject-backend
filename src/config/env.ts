@@ -34,6 +34,9 @@ const schema = z.object({
    */
   PUBLIC_API_URL: z.string().url().optional(),
 
+  /** Total bytes of images one account may keep stored (default 25 MB). */
+  UPLOAD_QUOTA_BYTES: z.coerce.number().int().positive().default(25 * 1024 * 1024),
+
   DEFAULT_TIMEZONE: z.string().default('Asia/Baku'),
   DEFAULT_LOCALE: z.enum(['az', 'en']).default('az'),
 

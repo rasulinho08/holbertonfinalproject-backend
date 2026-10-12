@@ -12,7 +12,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src prisma tests vitest.config.ts",
+    "lint": "eslint src prisma tests scripts/*.ts vitest.config.ts",
     "test": "vitest run",
     "smoke": "node scripts/smoke.mjs",
     "test:watch": "vitest",

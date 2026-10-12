@@ -72,4 +72,41 @@ describe('commerce', () => {
       .send({ paymentMethod: 'wallet', deliveryMethod: 'courier', address });
     expect(res.status).toBe(402);
   });
+
+  it('two simultaneous wallet checkouts cannot spend the same balance', async () => {
+    const session = await registerReader();
+    const auth = bearer(session);
+    const book = await inStockBook();
+    // Enough for one copy, not two.
+    await api().post(`${API}/gift-cards/redeem`).set(...auth).send({ code: await giftCard(book.price + 10) }).expect(200);
+    await api().post(`${API}/cart/items`).set(...auth).send({ bookId: book.id, quantity: 1 }).expect(200);
+
+    const order = () =>
+      api().post(`${API}/orders`).set(...auth).send({ paymentMethod: 'wallet', deliveryMethod: 'courier', address });
+    const results = await Promise.all([order(), order()]);
+    const created = results.filter((r) => r.status === 201);
+    expect(created.length, JSON.stringify(results.map((r) => [r.status, r.body.error?.code]))).toBe(1);
+
+    const wallet = await api().get(`${API}/wallet`).set(...auth);
+    expect(wallet.body.data.balance).toBeGreaterThanOrEqual(0);
+  });
+
+  it('two readers racing for the last copy: one order, stock never negative', async () => {
+    const book = await inStockBook();
+    await prisma.book.update({ where: { id: book.id }, data: { stock: 1 } });
+    const [a, b] = await Promise.all([registerReader(), registerReader()]);
+    for (const s of [a, b]) {
+      await api().post(`${API}/cart/items`).set(...bearer(s)).send({ bookId: book.id, quantity: 1 }).expect(200);
+    }
+
+    const results = await Promise.all(
+      [a, b].map((s) =>
+        api().post(`${API}/orders`).set(...bearer(s)).send({ paymentMethod: 'cod', deliveryMethod: 'courier', address }),
+      ),
+    );
+    expect(results.map((r) => r.status).sort()).toEqual([201, 409]);
+
+    const after = await prisma.book.findUniqueOrThrow({ where: { id: book.id }, select: { stock: true } });
+    expect(after.stock).toBe(0);
+  });
 });
