@@ -67,6 +67,14 @@ const schema = z.object({
 
   GOOGLE_BOOKS_API_KEY: z.string().optional(),
 
+  /** Google Gemini API key for the in-app book assistant. Unset: it is off. */
+  GEMINI_API_KEY: z.string().optional(),
+  /**
+   * Gemini model id. The 1.5 models were retired in 2025, so the default is a
+   * current free-tier model; change it here without touching code.
+   */
+  GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
+
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().default(587),
   SMTP_USER: z.string().optional(),

@@ -42,6 +42,13 @@ services:
       - key: CORS_ORIGINS
         sync: false
 
+      # Gemini API key for the book assistant. Set it in the Render dashboard;
+      # without it the assistant is shown as unavailable.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+
       - key: DEFAULT_TIMEZONE
         value: Asia/Baku
       - key: DEFAULT_LOCALE

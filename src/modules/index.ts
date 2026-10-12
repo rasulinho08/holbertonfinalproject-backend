@@ -26,6 +26,7 @@ import { publisherRouter } from './publisher/routes.js';
 import { adminRouter, reportsRouter } from './admin/routes.js';
 import { postsRouter } from './posts/routes.js';
 import { ocrRouter, uploadsRouter } from './media/routes.js';
+import { assistantRouter } from './assistant/routes.js';
 
 /**
  * The API router.
@@ -100,3 +101,4 @@ apiRouter.use('/posts', postsRouter);
 
 apiRouter.use('/uploads', uploadsRouter);
 apiRouter.use('/ocr', ocrRouter);
+apiRouter.use('/assistant', assistantRouter);
