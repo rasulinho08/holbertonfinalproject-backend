@@ -148,7 +148,14 @@ needs to:
 
 ## A note on the demo accounts
 
-The seed creates `leyla@`, `publisher@` and `admin@` with a shared, published
-password. That is fine for a graded project and wrong for anything real. If this
-ever carries actual users, change those passwords — or seed without them — before
-it does.
+The seed creates 16 demo accounts (14 readers, `publisher@`, `admin@`) that all
+share one published password. Before real users arrive, give them new ones —
+**never re-run `npm run seed` against production: it truncates every table.**
+
+```bash
+DATABASE_URL="postgresql://…neon…?sslmode=require" npm run user:set-password -- --demo --confirm
+```
+
+That changes only those accounts' password hashes, signs out their sessions,
+and prints the new passwords once. One account at a time:
+`npm run user:set-password -- publisher@kitabdostu.az --confirm`.

@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Every step here is something that would have caught a broken main before
+# Render tried to build it: a merge once truncated src/modules/users/service.ts,
+# `tsc` failed inside the Docker build, and every deploy after that was silently
+# skipped while the old image kept serving.
+jobs:
+  verify:
+    name: Typecheck, lint, build, test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: kitabdostu
+          POSTGRES_PASSWORD: kitabdostu
+          POSTGRES_DB: kitabdostu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kitabdostu -d kitabdostu"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://kitabdostu:kitabdostu@localhost:5432/kitabdostu?schema=public
+      # The integration suite creates and drops its own database through this.
+      TEST_DATABASE_URL: postgresql://kitabdostu:kitabdostu@localhost:5432/postgres
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef
+      JWT_REFRESH_SECRET: ci-refresh-secret-0123456789abcdef
+      SEED_PASSWORD: ci-seed-password
+      SMOKE_PASSWORD: ci-seed-password
+      CORS_ORIGINS: http://localhost:8081
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # The same command the Dockerfile runs. If this fails, Render cannot ship.
+      - name: Build
+        run: npm run build
+
+      - name: Integration tests
+        run: npm test
+
+      # End to end against the compiled server: migrate, seed, boot dist/,
+      # then walk every module with the smoke suites.
+      - name: Migrate and seed
+        run: npx prisma migrate deploy && npm run seed
+
+      - name: Start the built server
+        run: |
+          node dist/index.js > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4000/health && exit 0
+            sleep 1
+          done
+          cat server.log
+          exit 1
+
+      - name: Smoke (auth + catalogue)
+        run: npm run smoke
+
+      - name: Smoke (every module)
+        run: npm run smoke:full
+
+      - name: Server log
+        if: failure()
+        run: cat server.log || true

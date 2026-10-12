@@ -17,6 +17,8 @@ import { logger } from '../lib/logger.js';
 export interface OcrResult {
   text: string;
   confidence: number;
+  /** False when no OCR provider is configured: `text` is then empty. */
+  available: boolean;
 }
 
 const SAMPLES = [
@@ -28,11 +30,18 @@ const SAMPLES = [
 
 export async function extractText(imageUri: string): Promise<OcrResult> {
   if (env.OCR_PROVIDER === 'stub' || !env.OCR_PROVIDER_KEY) {
+    // In production the stub must not invent text: a reader photographing a
+    // page would get a random quote back and could post it as if it came from
+    // their book. Report the feature as unavailable instead.
+    if (env.isProduction) {
+      logger.warn('[ocr:stub] no OCR provider configured; returning no text');
+      return { text: '', confidence: 0, available: false };
+    }
     logger.info({ imageUri: imageUri.slice(0, 80) }, '[ocr:stub] returning a sample passage');
     // Chosen from the URI rather than at random, so repeating a request gives
     // the same answer and the flow is demonstrable.
     const index = [...imageUri].reduce((sum, c) => sum + c.charCodeAt(0), 0) % SAMPLES.length;
-    return { text: SAMPLES[index]!, confidence: 0.93 };
+    return { text: SAMPLES[index]!, confidence: 0.93, available: true };
   }
 
   // Wire the provider in here. Deliberately unimplemented rather than

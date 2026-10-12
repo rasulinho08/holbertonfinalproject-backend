@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { env } from '../config/env.js';
 import { logger } from '../lib/logger.js';
-import { prisma } from '../lib/prisma.js';
+import { prisma, type Prisma } from '../lib/prisma.js';
 
 /**
  * Card payments, via Payriff (MilliKart).
@@ -104,20 +104,15 @@ export async function verifyPayment(reference: string): Promise<{ status: string
   const raw = (await res.json()) as { payload?: { orderStatus?: string } };
   const status = raw.payload?.orderStatus === 'APPROVED' ? 'paid' : 'pending';
 
-  // Record the verification result for idempotency and audit
-  await prisma.payment.upsert({
-    where: { reference },
-    create: {
-      reference,
-      status,
-      amount: 0, // amount unknown from verification alone; order total is separate
-      rawResponse: raw,
-    },
-    update: {
-      status,
-      rawResponse: raw,
-    },
-  });
+  // Record the provider's verdict on the payment this reference belongs to,
+  // for idempotency and audit. Only an existing payment is updated: a payment
+  // row always belongs to an order, so a bare reference must not create one.
+  if (existingPayment && status === 'paid') {
+    await prisma.payment.update({
+      where: { reference },
+      data: { status: 'paid', rawResponse: raw as Prisma.InputJsonValue },
+    });
+  }
 
   return { status };
 }

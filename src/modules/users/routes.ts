@@ -13,16 +13,31 @@ import { isGenreSlug } from '../books/service.js';
 import { notify } from '../notifications/service.js';
 import * as service from './service.js';
 import { activityFor, friendsFeed } from './activity.js';
+import { deleteMediaOwnedBy, releaseMediaUrl } from '../media/service.js';
 
 export const usersRouter: Router = Router();
+
+/**
+ * Links a profile can carry. `z.string().url()` alone accepts any scheme —
+ * `javascript:` included, which the web build would happily put in an href —
+ * and the old schema let a cover photo be any string at all, including a
+ * multi-megabyte data: URI copied into every response that embeds the user.
+ */
+const httpUrl = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .url()
+    .refine((value) => /^https?:\/\//i.test(value), 'Use an http(s) address');
 
 const updateProfileSchema = z.object({
   name: z.string().trim().min(2).max(80).optional(),
   username: usernameSchema.optional(),
   bio: z.string().trim().max(300).nullable().optional(),
-  avatarUrl: z.string().url().nullable().optional(),
-  coverPhotoUrl: z.string().nullable().optional(),
-  website: z.string().trim().url().max(500).nullable().optional(),
+  avatarUrl: httpUrl(2000).nullable().optional(),
+  coverPhotoUrl: httpUrl(2000).nullable().optional(),
+  website: httpUrl(500).nullable().optional(),
 });
 
 const goalSchema = z.object({
@@ -51,6 +66,11 @@ usersRouter.patch(
       if (taken > 0) throw new ApiError('USERNAME_TAKEN', 'That username is taken');
     }
 
+    const before = await prisma.user.findUniqueOrThrow({
+      where: { id },
+      select: { avatarUrl: true, coverPhotoUrl: true },
+    });
+
     const user = await prisma.user.update({
       where: { id },
       data: {
@@ -62,6 +82,15 @@ usersRouter.patch(
         ...(req.body.website !== undefined && { website: req.body.website }),
       },
     });
+
+    // A replaced or removed photo that this API stored is deleted, so
+    // abandoned images do not pile up in the database.
+    if (req.body.avatarUrl !== undefined && req.body.avatarUrl !== before.avatarUrl) {
+      await releaseMediaUrl(before.avatarUrl, id);
+    }
+    if (req.body.coverPhotoUrl !== undefined && req.body.coverPhotoUrl !== before.coverPhotoUrl) {
+      await releaseMediaUrl(before.coverPhotoUrl, id);
+    }
 
     ok(res, await service.serializeUser(user, id));
   }),
@@ -75,7 +104,9 @@ usersRouter.delete(
     // Soft delete: reviews and quotes stay for moderation, and orders must
     // survive for accounting. The email and username are released so the
     // reader can register again, and are stamped to keep the unique indexes
-    // satisfied without colliding with a real address.
+    // satisfied without colliding with a real address. Everything that
+    // identifies the person — name, photos, bio, links — is removed, and
+    // their uploaded images stop being served.
     const stamp = Date.now().toString(36);
     await prisma.user.update({
       where: { id },
@@ -83,14 +114,17 @@ usersRouter.delete(
         deletedAt: new Date(),
         email: `deleted_${stamp}_${id}@deleted.kitabdostu.az`,
         username: `deleted_${stamp}`.slice(0, 20),
+        name: 'Silinmiş istifadəçi',
         passwordHash: null,
         avatarUrl: null,
+        coverPhotoUrl: null,
         bio: null,
         website: null,
         twoFactorEnabled: false,
         twoFactorSecret: null,
       },
     });
+    await deleteMediaOwnedBy(id);
     await revokeAllUserTokens(id);
     noContent(res);
   }),

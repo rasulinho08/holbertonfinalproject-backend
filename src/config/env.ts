@@ -27,6 +27,16 @@ const schema = z.object({
 
   CORS_ORIGINS: z.string().default('http://localhost:8081'),
 
+  /**
+   * Public origin of this API, used to build absolute URLs for uploaded
+   * images (e.g. https://kitabdostu-api.onrender.com). Optional: Render's own
+   * RENDER_EXTERNAL_URL is used when present, then the request's origin.
+   */
+  PUBLIC_API_URL: z.string().url().optional(),
+
+  /** Total bytes of images one account may keep stored (default 25 MB). */
+  UPLOAD_QUOTA_BYTES: z.coerce.number().int().positive().default(25 * 1024 * 1024),
+
   DEFAULT_TIMEZONE: z.string().default('Asia/Baku'),
   DEFAULT_LOCALE: z.enum(['az', 'en']).default('az'),
 

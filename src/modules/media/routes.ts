@@ -2,83 +2,64 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { asyncHandler } from '../../middleware/error.js';
 import { validate } from '../../middleware/validate.js';
-import { requireAuth } from '../../middleware/auth.js';
-import { ocrLimiter } from '../../middleware/rateLimit.js';
-import { created, ok, notFoundHandler } from '../../lib/envelope.js';
+import { requireAuth, userId } from '../../middleware/auth.js';
+import { ocrLimiter, uploadLimiter } from '../../middleware/rateLimit.js';
+import { created, ok } from '../../lib/envelope.js';
 import { storeUpload } from '../../integrations/storage.js';
 import { extractText } from '../../integrations/ocr.js';
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { env } from '../../config/env.js';
-
-// Uploads directory - local storage for development; S3 in production
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+import { getImage, saveImage } from './service.js';
 
 /* -------------------------------- uploads --------------------------------- */
 
 export const uploadsRouter: Router = Router();
 
+const KINDS = ['avatar', 'cover', 'review', 'quote', 'publication'] as const;
+
 uploadsRouter.post(
   '/',
   requireAuth,
+  uploadLimiter,
   validate(
-    z.object({
-      // The app sends a URI it already holds — either a local file it has
-      // uploaded to storage, or a remote one. Multipart is deliberately not
-      // handled here: presigned direct-to-storage uploads are the production
-      // path, and this endpoint is the fallback that records the result.
-      uri: z.string().min(1, 'uri is required').max(2000),
-      kind: z.enum(['avatar', 'cover', 'review', 'quote', 'publication']).default('review'),
-    }),
+    z
+      .object({
+        kind: z.enum(KINDS).default('review'),
+        // The image itself, base64-encoded (bare, or as a data: URL). This is
+        // the path the app uses: the bytes are stored and served back from
+        // GET /uploads/files/:id, so the URL works on every device.
+        data: z.string().min(1).max(8_000_000).optional(),
+        // Legacy: a URI the client already holds. Kept so app builds that are
+        // already installed keep working; the server only records it.
+        uri: z.string().min(1).max(2000).optional(),
+      })
+      .refine((body) => body.data !== undefined || body.uri !== undefined, {
+        message: 'Send the image as `data`',
+        path: ['data'],
+      }),
   ),
   asyncHandler(async (req, res) => {
-    const result = await storeUpload(req.body.uri, req.body.kind);
-    // If S3 is not configured, store the file locally and return the persistent URL
-    if (!env.S3_BUCKET || !env.S3_ACCESS_KEY) {
-      const filename = `${result.id}-${req.body.kind}`;
-      const filepath = path.join(UPLOADS_DIR, filename);
-      // Ensure directory exists
-      if (!fs.existsSync(UPLOADS_DIR)) {
-        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-      }
-      // For stub mode, we just record the reference; in production S3 would handle this
-      logger.info({ kind: req.body.kind, filename }, '[storage:stub] recorded local upload reference');
-      ok(res, { ...result, localUrl: `/api/v1/uploads/files/${filename}` });
-    } else {
-      ok(res, result);
+    if (req.body.data !== undefined) {
+      created(res, await saveImage(req, userId(req), req.body.kind, req.body.data));
+      return;
     }
+    created(res, await storeUpload(req.body.uri, req.body.kind));
   }),
 );
 
-/* -------------------------------- file serving ------------------------------- */
-
-export const uploadsFileRouter: Router = Router();
-
-uploadsFileRouter.get(
-  '/:filename',
-  requireAuth,
+/**
+ * Serves an uploaded image. Public on purpose — avatars and covers appear on
+ * public profiles — but only by unguessable id. Cached for an hour rather than
+ * forever: files are deleted when a photo is replaced or an account is
+ * removed, and an immutable year-long cache would keep serving them.
+ */
+uploadsRouter.get(
+  '/files/:id',
   asyncHandler(async (req, res) => {
-    const { filename } = req.params;
-    // Sanitize filename: use basename to strip any directory components,
-    // preventing path traversal attacks like ../../../etc/passwd.
-    // Also reject absolute paths and encoded traversal sequences.
-    const safeFilename = path.basename(filename) || 'placeholder';
-    if (!safeFilename) {
-      return notFoundHandler(req, res);
-    }
-    const filepath = path.join(UPLOADS_DIR, safeFilename);
-    // Additional safety: verify the resolved path is within UPLOADS_DIR
-    // by checking that the normalized path starts with the uploads directory.
-    const normalizedPath = path.normalize(filepath);
-    if (!normalizedPath.startsWith(path.normalize(UPLOADS_DIR) + path.sep) && normalizedPath !== path.normalize(UPLOADS_DIR)) {
-      return notFoundHandler(req, res);
-    }
-    if (fs.existsSync(normalizedPath)) {
-      res.sendFile(normalizedPath);
-    } else {
-      notFoundHandler(req, res);
-    }
+    const file = await getImage(req.params.id ?? '');
+    res.setHeader('Content-Type', file.mimeType);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+    res.setHeader('Content-Disposition', 'inline');
+    res.end(file.data);
   }),
 );
 

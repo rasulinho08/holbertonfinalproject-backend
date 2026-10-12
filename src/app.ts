@@ -109,6 +109,10 @@ export function createApp(): Express {
   );
 
   app.use(compression());
+  // Image uploads arrive base64-encoded in JSON (5 MB of image is ~6.7 MB of
+  // text). Only that route gets the larger limit; express.json() skips bodies
+  // that are already parsed, so the general 2 MB limit still applies elsewhere.
+  app.use('/api/v1/uploads', express.json({ limit: '8mb' }));
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true }));
 

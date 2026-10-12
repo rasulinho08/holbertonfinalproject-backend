@@ -52,6 +52,16 @@ export const authLimiter = rateLimit({
   keyGenerator: (req) => req.ip ?? 'unknown',
 });
 
+/**
+ * Image uploads are stored in the database, so each one costs real space.
+ * 30 an hour is far beyond what editing a profile needs.
+ */
+export const uploadLimiter = rateLimit({
+  ...shared,
+  windowMs: 60 * 60 * 1000,
+  limit: env.isProduction ? 30 : 1000,
+});
+
 /** OCR calls a paid third party, so it keeps its tight budget everywhere. */
 export const ocrLimiter = rateLimit({ ...shared, windowMs: 60 * 60 * 1000, limit: 30 });
 

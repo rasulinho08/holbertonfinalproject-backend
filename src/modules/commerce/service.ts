@@ -1,5 +1,5 @@
 import type { DeliveryMethod, OrderStatus, PaymentMethod, Prisma } from '@prisma/client';
-import { prisma, money, isUniqueViolation } from '../../lib/prisma.js';
+import { prisma, money } from '../../lib/prisma.js';
 import { ApiError, badRequest, conflict, forbidden, notFound, outOfStock } from '../../lib/errors.js';
 import { logger } from '../../lib/logger.js';
 import { env } from '../../config/env.js';
@@ -251,16 +251,21 @@ export async function checkout(
   });
   if (!user) throw notFound('User');
 
-  if (input.paymentMethod === 'wallet' && money(user.walletBalance) < cart.total) {
-    throw new ApiError('PAYMENT_FAILED', 'Your wallet balance is not enough for this order');
-  }
-
   // The discount lands on the first order, not spread across them — splitting a
   // gift card across shipments makes every total unreconcilable with the card.
   let remainingDiscount = giftCard ? money(giftCard.amount) : 0;
 
+  // What the reader actually pays: the sum of the order totals, after the gift
+  // card. Charging `cart.total` here once debited the wallet the pre-discount
+  // amount while the orders (and any refund) carried the discounted one.
+  const payable = round(Math.max(0, cart.total - Math.min(remainingDiscount, cart.subtotal)));
+  if (input.paymentMethod === 'wallet' && money(user.walletBalance) < payable) {
+    throw new ApiError('PAYMENT_FAILED', 'Your wallet balance is not enough for this order');
+  }
+
   const created = await prisma.$transaction(async (tx) => {
     const orders: string[] = [];
+    let charged = 0;
 
     for (const group of cart.groups) {
       // Re-checked inside the transaction: the stock read in getCart is stale
@@ -278,6 +283,7 @@ export async function checkout(
       const discount = Math.min(remainingDiscount, group.subtotal);
       remainingDiscount -= discount;
       const total = round(group.subtotal + group.deliveryFee - discount);
+      charged = round(charged + total);
 
       const order = await tx.order.create({
         data: {
@@ -319,30 +325,43 @@ export async function checkout(
       });
 
       for (const item of group.items) {
-        await tx.book.update({
-          where: { id: item.bookId },
+        // Conditional decrement: two checkouts racing for the last copy cannot
+        // both pass, because the second update matches no row.
+        const { count } = await tx.book.updateMany({
+          where: { id: item.bookId, stock: { gte: item.quantity } },
           data: { stock: { decrement: item.quantity } },
         });
+        if (count === 0) {
+          throw outOfStock(`"${item.book.title}" is no longer available in that quantity`);
+        }
       }
 
       orders.push(order.id);
     }
 
     if (giftCard) {
-      await tx.giftCard.update({
-        where: { id: giftCard.id },
+      // Only an unused card can be spent; a concurrent checkout with the same
+      // code matches no row and rolls back.
+      const { count } = await tx.giftCard.updateMany({
+        where: { id: giftCard.id, usedAt: null },
         data: { usedById: userId, usedAt: new Date() },
       });
+      if (count === 0) throw conflict('This gift card has already been used');
     }
 
     if (input.paymentMethod === 'wallet') {
-      await tx.user.update({
-        where: { id: userId },
-        data: { walletBalance: { decrement: cart.total } },
+      // Re-checked atomically: the balance read above is stale if another
+      // checkout spent from the wallet in the meantime.
+      const { count } = await tx.user.updateMany({
+        where: { id: userId, walletBalance: { gte: charged } },
+        data: { walletBalance: { decrement: charged } },
       });
+      if (count === 0) {
+        throw new ApiError('PAYMENT_FAILED', 'Your wallet balance is not enough for this order');
+      }
       // The balance is never written without a matching transaction row.
       await tx.walletTransaction.create({
-        data: { userId, amount: -cart.total, reason: 'order_payment' },
+        data: { userId, amount: -charged, reason: 'order_payment' },
       });
     }
 
@@ -602,26 +621,24 @@ export async function getWallet(userId: string) {
 export async function redeemGiftCard(userId: string, code: string) {
   const card = await resolveGiftCard(code);
 
-  try {
-    await prisma.$transaction([
-      prisma.giftCard.update({
-        where: { id: card.id },
-        data: { usedById: userId, usedAt: new Date() },
-      }),
-      prisma.user.update({
-        where: { id: userId },
-        data: { walletBalance: { increment: card.amount } },
-      }),
-      prisma.walletTransaction.create({
-        data: { userId, amount: card.amount, reason: 'gift_card' },
-      }),
-    ]);
-  } catch (error) {
-    // Two devices redeeming the same code race here; the loser sees a conflict
-    // rather than a double credit.
-    if (isUniqueViolation(error)) throw conflict('That gift card has already been used');
-    throw error;
-  }
+  await prisma.$transaction(async (tx) => {
+    // Claim the card only if it is still unused. Two devices redeeming the same
+    // code race here; the loser matches no row and gets a conflict rather than
+    // a second credit.
+    const { count } = await tx.giftCard.updateMany({
+      where: { id: card.id, usedAt: null },
+      data: { usedById: userId, usedAt: new Date() },
+    });
+    if (count === 0) throw conflict('That gift card has already been used');
+
+    await tx.user.update({
+      where: { id: userId },
+      data: { walletBalance: { increment: card.amount } },
+    });
+    await tx.walletTransaction.create({
+      data: { userId, amount: card.amount, reason: 'gift_card' },
+    });
+  });
 
   const user = await prisma.user.findUnique({
     where: { id: userId },

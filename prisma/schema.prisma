@@ -201,6 +201,7 @@ model User {
   orderEvents     OrderEvent[]
   searchHistory   SearchHistory[]
   publications    Publication[]
+  mediaFiles      MediaFile[]
 
   @@index([role])
   @@map("users")
@@ -1002,3 +1003,24 @@ model PublicationBook {
   @@map("publication_books")
 }
 
+/// Images readers upload: avatars, profile cover photos, publication covers.
+///
+/// Kept in Postgres rather than on disk because the API runs on hosts with an
+/// ephemeral filesystem (Render's free tier wipes it on every deploy), and
+/// rather than in S3 because no storage account is configured. Files are small
+/// (the app downsizes before uploading) and capped server-side. `mimeType` is
+/// sniffed from the bytes, never taken from the client.
+model MediaFile {
+  id        String   @id @default(uuid()) @db.Uuid
+  ownerId   String?  @map("owner_id") @db.Uuid
+  kind      String
+  mimeType  String   @map("mime_type")
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  owner User? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@map("media_files")
+}

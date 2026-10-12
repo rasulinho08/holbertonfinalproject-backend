@@ -99,5 +99,4 @@ apiRouter.use('/admin', adminRouter);
 apiRouter.use('/posts', postsRouter);
 
 apiRouter.use('/uploads', uploadsRouter);
-apiRouter.use('/uploads/files', uploadsFileRouter);
 apiRouter.use('/ocr', ocrRouter);
